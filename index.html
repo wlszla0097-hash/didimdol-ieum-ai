@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>지원사업 이음 AI | 우리 회사가 받을 수 있는 고용지원사업 찾기</title>
+  <meta name="description" content="공공데이터와 AI로 기업 맞춤 고용지원사업을 진단하고, 근로계약 조건을 1차 점검하는 서비스">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{const t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">본문 바로가기</a>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#home" aria-label="지원사업 이음 AI 홈">
+      <img src="images/favicon.svg" alt="" width="28" height="28"><span>지원사업 <b>이음</b> AI</span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav">☰</button>
+    <nav id="nav" class="nav">
+      <a href="#home" data-route="home">홈</a>
+      <a href="#diagnose" data-route="diagnose">AI 기업 진단</a>
+      <a href="#programs" data-route="programs">지원사업 찾기</a>
+      <a href="#check" data-route="check">근로계약 점검</a>
+      <a href="#about" data-route="about">서비스 안내</a>
+      <button class="theme-btn" id="themeBtn" aria-label="다크 모드 전환">🌙</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <!-- 1. 홈 -->
+  <section id="home" class="page" data-page="home">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <p class="eyebrow">공공데이터 × AI 고용지원 길잡이</p>
+        <h1>우리 회사가 받을 수 있는<br><span class="hl">고용지원사업</span>, 3분이면 찾습니다</h1>
+        <p class="lead">수백 쪽 지침을 읽지 않아도 됩니다. 기업 정보를 입력하면 정부 공공서비스 데이터에서 후보를 고르고, AI가 우리 회사에 맞는 사업과 <b>다음 단계 로드맵</b>을 정리해 드립니다.</p>
+        <div class="cta">
+          <a class="btn primary" href="#diagnose">AI 기업 진단 시작</a>
+          <a class="btn ghost" href="#programs">지원사업 둘러보기</a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap">
+      <h2 class="sec-title">현장에서 반복되는 세 가지 문제</h2>
+      <div class="cards three">
+        <article class="card"><span class="num">01</span><h3>지원사업 간 연계 공백</h3><p>한 사업에 참여한 뒤 이어서 받을 수 있는 사업을 기업이 직접 찾아야 합니다.</p><p class="sol">→ 참여 이후 <b>다음 단계 로드맵</b> 제시</p></article>
+        <article class="card"><span class="num">02</span><h3>높은 진입 허들</h3><p>요건이 복잡해 소규모 기업은 '우리가 대상인지'부터 판단하기 어렵습니다.</p><p class="sol">→ 기업 정보 기반 <b>맞춤 진단</b></p></article>
+        <article class="card"><span class="num">03</span><h3>서류 검토 부담</h3><p>계약서 양식이 제각각이라 기본 요건 확인에도 시간이 걸립니다.</p><p class="sol">→ 근거가 붙은 <b>1차 점검 목록</b></p></article>
+      </div>
+      <div class="principle">
+        <strong>AI는 정리와 설명, 판단은 규칙과 사람</strong>
+        <p>AI는 공공데이터에 있는 사업 중에서만 추천하고, 숫자 계산은 코드가 합니다. 최종 자격은 소관기관이 확정합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. AI 기업 진단 -->
+  <section id="diagnose" class="page" data-page="diagnose" hidden>
+    <div class="wrap">
+      <header class="page-head"><p class="eyebrow">AI 기능 ①</p><h1>AI 기업 진단</h1><p>기업 정보를 입력하면 참여 가능성이 높은 지원사업과 연계 로드맵을 안내합니다.</p></header>
+      <div class="grid2">
+        <form id="diagForm" class="panel" novalidate>
+          <div class="field"><label for="industry">업종 <em>*</em></label><input id="industry" name="industry" maxlength="40" placeholder="예: 제조업, 도소매업, IT서비스"></div>
+          <div class="row2">
+            <div class="field"><label for="size">상시근로자 수 <em>*</em></label>
+              <select id="size" name="size"><option value="">선택</option><option>5인 미만</option><option>5~29인</option><option>30~99인</option><option>100~299인</option><option>300인 이상</option></select></div>
+            <div class="field"><label for="region">지역</label><input id="region" name="region" maxlength="20" placeholder="예: 경북 상주"></div>
+          </div>
+          <fieldset class="field"><legend>올해 계획 (하나 이상) <em>*</em></legend>
+            <div class="chips">
+              <label><input type="checkbox" name="hire_youth"> 청년 채용</label>
+              <label><input type="checkbox" name="convert_regular"> 정규직 전환</label>
+              <label><input type="checkbox" name="flexible_work"> 유연근무 도입</label>
+              <label><input type="checkbox" name="hire_senior"> 고령자 채용·계속고용</label>
+              <label><input type="checkbox" name="parental"> 육아휴직·대체인력</label>
+              <label><input type="checkbox" name="hire_disabled"> 장애인 채용</label>
+              <label><input type="checkbox" name="training"> 직원 교육훈련</label>
+              <label><input type="checkbox" name="keep_employment"> 고용 유지</label>
+            </div>
+          </fieldset>
+          <div class="field"><label for="current">현재 참여 중인 지원사업</label><input id="current" name="current" maxlength="200" placeholder="예: 청년일자리도약장려금 (없으면 비워두세요)"></div>
+          <div class="field"><label for="plan">추가 설명</label><textarea id="plan" name="plan" maxlength="500" rows="3" placeholder="예: 내년 상반기 생산직 청년 2명 채용, 기존 기간제 1명 정규직 전환 예정"></textarea><span class="counter" data-for="plan">0/500</span></div>
+          <p class="msg" id="diagMsg" role="alert" hidden></p>
+          <button class="btn primary block" id="diagBtn" type="submit">AI 진단 받기</button>
+          <p class="fine">개인정보(성명·주민번호 등)는 입력하지 마세요. 입력 내용은 저장되지 않습니다.</p>
+        </form>
+        <div class="panel result" id="diagResult" aria-live="polite">
+          <div class="empty"><span>🔎</span><p>왼쪽에 기업 정보를 입력하면<br>이곳에 진단 결과가 표시됩니다.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 지원사업 찾기 -->
+  <section id="programs" class="page" data-page="programs" hidden>
+    <div class="wrap">
+      <header class="page-head"><p class="eyebrow">공공데이터</p><h1>지원사업 찾기</h1><p>행정안전부 공공서비스(혜택) 정보에서 사업주 대상 고용지원사업을 모았습니다.</p></header>
+      <form id="searchForm" class="search" role="search"><input id="q" maxlength="40" placeholder="검색어 (예: 청년, 유연근무, 육아)" aria-label="지원사업 검색어"><button class="btn primary">검색</button></form>
+      <p class="src" id="progSrc"></p>
+      <div class="cards list" id="progList"><div class="skeleton"></div><div class="skeleton"></div></div>
+    </div>
+  </section>
+
+  <!-- 4. 근로계약 점검 -->
+  <section id="check" class="page" data-page="check" hidden>
+    <div class="wrap">
+      <header class="page-head"><p class="eyebrow">AI 기능 ②</p><h1>근로계약 1차 점검</h1><p>근로조건을 입력하면 규칙 엔진이 최저임금·근로시간·휴게·필수 기재사항을 점검하고, AI가 쉬운 말로 설명합니다.</p></header>
+      <div class="grid2">
+        <form id="checkForm" class="panel" novalidate>
+          <div class="row2">
+            <div class="field"><label for="employment_type">고용 형태</label><select id="employment_type" name="employment_type"><option>정규직</option><option>기간제</option><option>단시간</option></select></div>
+            <div class="field"><label for="wage_type">임금 형태</label><select id="wage_type" name="wage_type"><option>월급</option><option>시급</option><option>연봉</option></select></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="start_date">계약 시작일</label><input type="date" id="start_date" name="start_date"></div>
+            <div class="field"><label for="end_date">계약 종료일</label><input type="date" id="end_date" name="end_date"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="base_wage">기본급(원) <em>*</em></label><input inputmode="numeric" id="base_wage" name="base_wage" placeholder="예: 2,156,880"></div>
+            <div class="field"><label for="allowances">고정수당 합계(원)</label><input inputmode="numeric" id="allowances" name="allowances" placeholder="예: 200,000"></div>
+          </div>
+          <div class="row3">
+            <div class="field"><label for="weekly_hours">주 소정근로 <em>*</em></label><input inputmode="decimal" id="weekly_hours" name="weekly_hours" placeholder="40"></div>
+            <div class="field"><label for="daily_hours">1일 소정근로</label><input inputmode="decimal" id="daily_hours" name="daily_hours" placeholder="8"></div>
+            <div class="field"><label for="break_minutes">휴게(분)</label><input inputmode="numeric" id="break_minutes" name="break_minutes" placeholder="60"></div>
+          </div>
+          <fieldset class="field"><legend>계약서에 적혀 있나요?</legend>
+            <div class="chips">
+              <label><input type="checkbox" name="has_holiday" checked> 주휴일</label>
+              <label><input type="checkbox" name="has_leave" checked> 연차휴가</label>
+              <label><input type="checkbox" name="has_place" checked> 근무 장소</label>
+              <label><input type="checkbox" name="has_job" checked> 업무 내용</label>
+              <label><input type="checkbox" name="has_payday" checked> 지급일·방법</label>
+            </div>
+          </fieldset>
+          <p class="msg" id="checkMsg" role="alert" hidden></p>
+          <button class="btn primary block" id="checkBtn" type="submit">점검하기</button>
+          <button class="btn ghost block" id="sampleBtn" type="button">예시 값 채우기</button>
+        </form>
+        <div class="panel result" id="checkResult" aria-live="polite">
+          <div class="empty"><span>📝</span><p>근로조건을 입력하고 [점검하기]를 누르세요.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 서비스 안내 -->
+  <section id="about" class="page" data-page="about" hidden>
+    <div class="wrap narrow">
+      <header class="page-head"><p class="eyebrow">About</p><h1>서비스 안내</h1></header>
+      <h2 class="sec-title">이렇게 동작합니다</h2>
+      <ol class="flow">
+        <li><b>공공데이터 조회</b> — 행정안전부 공공서비스(혜택) 정보에서 사업주 대상 사업을 가져옵니다.</li>
+        <li><b>규칙으로 후보 선별</b> — 입력한 계획과 관련된 사업을 코드가 먼저 추립니다.</li>
+        <li><b>AI 정리</b> — AI는 후보 목록 안에서만 추천하고 이유·확인할 요건·로드맵을 씁니다.</li>
+        <li><b>서버 검증</b> — 후보에 없는 사업이 나오면 서버가 제거하고, 사업명·링크는 원본 데이터로 표시합니다.</li>
+      </ol>
+      <h2 class="sec-title">자주 묻는 질문</h2>
+      <details><summary>진단 결과대로 신청하면 지원금을 받을 수 있나요?</summary><p>아닙니다. 이 서비스는 1차 안내입니다. 실제 자격과 지원 금액은 소관기관의 심사로 확정되니, 각 사업의 상세 링크에서 최신 지침을 확인하세요.</p></details>
+      <details><summary>입력한 정보는 저장되나요?</summary><p>저장하지 않습니다. 진단 요청 시 AI 서비스로 전송되어 결과를 만든 뒤 버려집니다. 개인정보는 입력하지 마세요.</p></details>
+      <details><summary>'예시 데이터'라고 표시되는 건 무엇인가요?</summary><p>공공데이터 API에 연결되지 않았을 때 쓰는 내장 데이터입니다. 개요 수준이므로 반드시 상세 링크에서 확인하세요.</p></details>
+      <details><summary>근로계약 점검 결과는 법적 판단인가요?</summary><p>아닙니다. 입력값을 기준으로 한 규칙 기반 1차 점검입니다. 최종 판단은 노무 전문가나 관할 고용노동지청에 확인하세요.</p></details>
+      <h2 class="sec-title">데이터 출처</h2>
+      <ul class="sources">
+        <li>행정안전부_대한민국 공공서비스(혜택) 정보 — 공공데이터포털(data.go.kr)</li>
+        <li>최저임금 — 고용노동부 고시 (2024~2026년)</li>
+        <li>법령 조문 — 근로기준법, 최저임금법, 기간제 및 단시간근로자 보호 등에 관한 법률</li>
+      </ul>
+      <p class="status" id="status">연동 상태 확인 중…</p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer"><div class="wrap">지원사업 이음 AI · MVP 데모 · 결과는 참고용이며 최종 자격은 소관기관이 확정합니다.</div></footer>
+<script src="js/app.js"></script>
+</body>
+</html>
