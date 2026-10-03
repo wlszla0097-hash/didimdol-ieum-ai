@@ -2,7 +2,7 @@
 
 > 공공데이터와 AI로 **우리 회사가 받을 수 있는 고용지원사업**을 진단하고, **근로계약 조건을 1차 점검**하는 웹 서비스 (MVP)
 
-- **배포 URL**: https://(배포 후 입력).vercel.app
+- **배포 URL**: https://didimdol-ieum-ai-zeta.vercel.app
 - **서비스 기획서**: [docs/service-plan.md](docs/service-plan.md)
 - **스크린샷**: [docs/screenshots/](docs/screenshots/)
 
