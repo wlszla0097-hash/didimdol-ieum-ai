@@ -1,7 +1,7 @@
 """공공데이터 연동: 행정안전부_대한민국 공공서비스(혜택) 정보 (공공데이터포털, api.odcloud.kr).
 
 DATA_GO_KR_KEY 환경 변수(공공데이터포털 일반 인증키)가 없거나 호출이 실패하면
-내장된 예시 데이터(_sample.py)로 대체하고, 화면에 그 사실을 표시한다.
+내장된 예시 데이터(sample.py)로 대체하고, 화면에 그 사실을 표시한다.
 """
 import http.client
 import json
@@ -11,7 +11,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from _sample import SAMPLE_PROGRAMS
+from sample import SAMPLE_PROGRAMS
 
 BASE = os.environ.get("ODCLOUD_BASE_URL", "https://api.odcloud.kr/api/gov24/v3")
 AGENCIES = ["고용노동부", "보건복지부"]

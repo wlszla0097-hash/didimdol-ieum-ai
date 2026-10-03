@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 API = ROOT / "api"
-sys.path.insert(0, str(API))
+sys.path.insert(0, str(ROOT / "core"))
 
 
 def load_env():
@@ -33,7 +33,7 @@ _handlers = {}
 def api_handler(name):
     if name not in _handlers:
         path = API / f"{name}.py"
-        if name.startswith("_") or not path.exists():
+        if not path.exists():
             return None
         spec = importlib.util.spec_from_file_location(f"api_{name}", path)
         mod = importlib.util.module_from_spec(spec)

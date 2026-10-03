@@ -2,10 +2,10 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core"))  # 공용 모듈 위치
 
-from _ai import model_name, provider  # noqa: E402
-from _common import JsonHandler  # noqa: E402
+from ai import model_name, provider  # noqa: E402
+from common import JsonHandler  # noqa: E402
 
 
 class handler(JsonHandler):

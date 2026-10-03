@@ -7,11 +7,11 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core"))  # 공용 모듈 위치
 
-from _ai import generate_json, provider  # noqa: E402
-from _common import ApiError, JsonHandler, num, text  # noqa: E402
-from _labor import check  # noqa: E402
+from ai import generate_json, provider  # noqa: E402
+from common import ApiError, JsonHandler, num, text  # noqa: E402
+from labor import check  # noqa: E402
 
 SYSTEM = """당신은 근로계약 점검 결과를 사업주에게 쉽게 설명하는 보조자입니다.
 - [점검 결과]에 있는 내용만 설명하고, 새로운 위반 판단이나 수치를 추가하지 않습니다.

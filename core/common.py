@@ -1,4 +1,4 @@
-"""api/ 함수들이 함께 쓰는 도구 (밑줄로 시작하는 파일은 Vercel이 URL로 노출하지 않음)."""
+"""api/ 함수들이 함께 쓰는 도구. (core/ 폴더는 URL로 노출되지 않는 공용 모듈)"""
 import json
 import time
 from http.server import BaseHTTPRequestHandler

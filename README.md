@@ -39,20 +39,21 @@
 ├─ css/style.css         # 디자인, 반응형(900px·720px), 다크 모드
 ├─ js/app.js             # 메뉴 이동, 입력 검증, fetch 호출, 결과 표시, 실패 안내
 ├─ images/favicon.svg
-├─ api/                  # 백엔드 (Vercel이 각 .py 파일을 /api/파일명 주소로 실행)
+├─ api/                  # 백엔드: 파일 1개 = 함수 1개 (Vercel이 /api/파일명 주소로 실행)
 │  ├─ diagnose.py        # POST /api/diagnose  AI 기업 진단
 │  ├─ check.py           # POST /api/check     근로계약 점검
 │  ├─ programs.py        # GET  /api/programs  지원사업 목록(공공데이터)
-│  ├─ health.py          # GET  /api/health    연동 상태(키 설정 여부만)
-│  ├─ _ai.py             # AI 호출 (Claude/Gemini)      ┐ 밑줄(_)로 시작하는 파일은
-│  ├─ _publicdata.py     # 공공데이터 호출·캐시·후보 선별 │ 주소로 노출되지 않는
-│  ├─ _labor.py          # 근로조건 규칙 엔진            │ 공용 모듈
-│  ├─ _common.py         # JSON 처리, 오류, 요청 제한    │
-│  └─ _sample.py         # 공공데이터 미연결 시 예시 데이터 ┘
+│  └─ health.py          # GET  /api/health    연동 상태(키 설정 여부만)
+├─ core/                 # 함수들이 함께 쓰는 공용 모듈 (함수로 실행되지 않음)
+│  ├─ ai.py              # AI 호출 (Claude/Gemini)
+│  ├─ publicdata.py      # 공공데이터 호출·캐시·후보 선별
+│  ├─ labor.py           # 근로조건 규칙 엔진
+│  ├─ common.py          # JSON 처리, 오류, 요청 제한
+│  └─ sample.py          # 공공데이터 미연결 시 예시 데이터
 ├─ tests/test_api.py     # 핵심 로직 테스트
 ├─ dev_server.py         # 로컬 실행용 서버 (Vercel CLI 없이)
 ├─ requirements.txt      # 파이썬 패키지 (표준 라이브러리만 써서 비어 있음)
-├─ vercel.json           # 함수 최대 실행 시간 등 배포 설정
+├─ vercel.json           # 함수 실행 시간, 함께 묶을 파일(core/) 등 배포 설정
 └─ .env.example          # 환경 변수 이름 예시 (실제 키는 넣지 않음)
 ```
 

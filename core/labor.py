@@ -1,7 +1,7 @@
 """근로계약 조건 1차 점검 (규칙 기반). 판단은 코드가, AI는 결과 설명만 한다."""
 from datetime import date
 
-from _common import num
+from common import num
 
 MIN_WAGE = {2024: 9860, 2025: 10030, 2026: 10320}  # 시급(원). 매년 고시 후 추가
 VIOLATION, CHECK, OK = "위반 의심", "확인 필요", "적정"

@@ -7,11 +7,11 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core"))  # 공용 모듈 위치
 
-from _ai import generate_json, model_name, provider  # noqa: E402
-from _common import ApiError, JsonHandler, text  # noqa: E402
-from _publicdata import load_programs, shortlist  # noqa: E402
+from ai import generate_json, model_name, provider  # noqa: E402
+from common import ApiError, JsonHandler, text  # noqa: E402
+from publicdata import load_programs, shortlist  # noqa: E402
 
 SIZES = ["5인 미만", "5~29인", "30~99인", "100~299인", "300인 이상"]
 FLAGS = ["hire_youth", "hire_senior", "hire_disabled", "convert_regular", "flexible_work", "parental", "training", "keep_employment"]

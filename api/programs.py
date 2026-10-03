@@ -3,10 +3,10 @@ import os
 import sys
 from urllib.parse import parse_qs, urlparse
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core"))  # 공용 모듈 위치
 
-from _common import JsonHandler, text  # noqa: E402
-from _publicdata import load_programs, search  # noqa: E402
+from common import JsonHandler, text  # noqa: E402
+from publicdata import load_programs, search  # noqa: E402
 
 
 class handler(JsonHandler):

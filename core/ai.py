@@ -10,7 +10,7 @@ import re
 import urllib.error
 import urllib.request
 
-from _common import ApiError
+from common import ApiError
 
 TIMEOUT = 25  # 초. Vercel 함수 제한 시간(vercel.json maxDuration) 안에서 끝나도록
 
