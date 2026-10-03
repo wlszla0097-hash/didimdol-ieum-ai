@@ -229,4 +229,19 @@ async function loadStatus() {
   }
 }
 
+// AI 키가 아직 없으면 AI 기능 화면 위에 안내 (최종 테스트 전 배포 확인용)
+(async () => {
+  try {
+    const s = await api("/api/health", { timeoutMs: 10000 });
+    if (s.ai === "not_configured") {
+      ["#diagForm", "#checkForm"].forEach((sel) => {
+        const note = document.createElement("p");
+        note.className = "msg info";
+        note.textContent = "현재 AI 키가 설정되지 않아 AI 결과 대신 안내 메시지가 표시됩니다. (관리자: Vercel 환경 변수에 키 등록 후 재배포)";
+        $(sel).prepend(note);
+      });
+    }
+  } catch (e) { /* 상태 확인 실패는 무시 */ }
+})();
+
 route();
