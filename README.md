@@ -6,7 +6,8 @@
 
 - **배포 URL**: https://didimdol-ieum-ai-zeta.vercel.app
 - **서비스 기획서**: [docs/service-plan.md](docs/service-plan.md)
-- **스크린샷**: [docs/screenshots/](docs/screenshots/)
+- **스크린샷**: [docs/screenshots/](docs/screenshots/) (배포 URL·실제 AI 동작, 데스크톱 9장 + 모바일 3장)
+- **AI 코딩 도구 사용 기록**: [docs/ai-coding-log.md](docs/ai-coding-log.md)
 - 2026 고용24 국민참여 AI 고용서비스 발굴 해커톤 아이디어 기획안의 MVP 범위를 구현한 시제품입니다. **모든 인물·공고·지원자는 합성 데이터**입니다.
 
 ## 1. 서비스 소개
