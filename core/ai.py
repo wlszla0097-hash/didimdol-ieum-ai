@@ -15,10 +15,15 @@ from common import ApiError
 TIMEOUT = 25  # 초. Vercel 함수 제한 시간(vercel.json maxDuration) 안에서 끝나도록
 
 
+def _key(name: str) -> str:
+    """키 앞뒤 공백·줄바꿈·따옴표 제거 (붙여넣기 실수로 인증 실패하는 것 방지)."""
+    return os.environ.get(name, "").strip().strip('"').strip("'").strip()
+
+
 def provider() -> str | None:
-    if os.environ.get("ANTHROPIC_API_KEY"):
+    if _key("ANTHROPIC_API_KEY"):
         return "claude"
-    if os.environ.get("GEMINI_API_KEY"):
+    if _key("GEMINI_API_KEY"):
         return "gemini"
     return None
 
@@ -39,7 +44,7 @@ def _post(url: str, headers: dict, body: dict) -> dict:
         detail = e.read()[:300].decode("utf-8", "ignore")
         print(f"[ai] HTTP {e.code}: {detail}")
         if e.code in (401, 403):
-            raise ApiError(502, "ai_auth", "AI 서비스 인증에 실패했습니다. 관리자가 API 키 설정을 확인해야 합니다.")
+            raise ApiError(502, "ai_auth", f"AI 서비스 인증에 실패했습니다(HTTP {e.code}). 관리자가 API 키 설정을 확인해야 합니다.")
         if e.code == 404:
             raise ApiError(502, "ai_model", "AI 모델 이름을 찾을 수 없습니다. 관리자가 AI_MODEL 환경 변수를 확인해야 합니다.")
         if e.code == 429:
@@ -63,14 +68,14 @@ def generate_json(system: str, user: str, max_tokens: int = 1500) -> dict:
     if p == "claude":
         base = os.environ.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
         res = _post(f"{base}/v1/messages",
-                    {"x-api-key": os.environ["ANTHROPIC_API_KEY"], "anthropic-version": "2023-06-01"},
+                    {"x-api-key": _key("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01"},
                     {"model": model_name(), "max_tokens": max_tokens, "system": system,
                      "messages": [{"role": "user", "content": user}]})
         out = "".join(b.get("text", "") for b in res.get("content", []))
     else:
         base = os.environ.get("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com")
         res = _post(f"{base}/v1beta/models/{model_name()}:generateContent",
-                    {"x-goog-api-key": os.environ["GEMINI_API_KEY"]},
+                    {"x-goog-api-key": _key("GEMINI_API_KEY")},
                     {"systemInstruction": {"parts": [{"text": system}]},
                      "contents": [{"role": "user", "parts": [{"text": user}]}],
                      "generationConfig": {"maxOutputTokens": max_tokens, "responseMimeType": "application/json", "temperature": 0.2}})

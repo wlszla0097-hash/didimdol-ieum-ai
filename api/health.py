@@ -14,5 +14,7 @@ class handler(JsonHandler):
                 "public_data": "configured" if os.environ.get("DATA_GO_KR_KEY") else "sample_only",
                 "work24": "configured" if os.environ.get("WORK24_KEY") else "synthetic",
                 # 키 값은 내보내지 않고 '등록됨/비어 있음/없음'만 표시 (설정 오류 진단용)
-                "keys": {k: ("set" if os.environ.get(k, "").strip() else "empty" if k in os.environ else "missing")
+                "keys": {k: ({"status": "set", "prefix_ok": os.environ[k].strip().strip('"').strip("'").startswith("sk-ant-" if "ANTHROPIC" in k else "AI"),
+                              "had_spaces": os.environ[k] != os.environ[k].strip()}
+                             if os.environ.get(k, "").strip() else "empty" if k in os.environ else "missing")
                          for k in ("ANTHROPIC_API_KEY", "GEMINI_API_KEY")}}
