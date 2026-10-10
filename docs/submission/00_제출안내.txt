@@ -1,0 +1,23 @@
+AI 웹 개발 과제 제출 패키지 — 이음24 (2026-10-10 기준)
+
+■ 배포 URL : https://didimdol-ieum-ai-zeta.vercel.app
+■ GitHub   : https://github.com/wlszla0097-hash/didimdol-ieum-ai
+
+■ 제출 패키지(필수 5종) ↔ 이 폴더
+ 1. 배포된 웹 서비스 (Vercel URL) ........ 위 배포 URL
+ 2. GitHub 저장소 ........................ 위 GitHub 주소 (프론트 index.html·css·js / 백엔드 api/ / 공용 core/)
+ 3. README.md ............................ 저장소 루트 README.md
+ 4. 서비스 기획서 ........................ docs/service-plan.md
+ 5. 증빙 자료
+    - 서비스 스크린샷 (데스크톱 9 + 모바일 3, AI 동작 포함) ... docs/screenshots/
+    - AI 코딩 도구 사용 과정 .................................. docs/ai-coding-log.md (실제 오류 9건), GitHub 커밋 이력
+
+■ 기타
+ docs/submission/06_제출점검표.xlsx : 과제 요구사항 대조표 (전 항목 충족)
+ docs/submission/07_발표대본.txt    : 평가자 설명용 5분 대본 + 예상 질문
+
+■ 평가자 테스트 방법
+ 구직자 화면 → '예시 불러오기' → 동의 체크 → [AI로 이력 정리 · 공고 추천]
+ → 추천 공고에서 [이 공고에 지원] → 기업 화면 → [채용 확정] → [오류 있는 예시로 바꾸기] → [근로계약 점검]
+ → [주무관 확인 화면으로 보내기]
+ ※ 🔒 내부 메뉴는 실제 고객사용이라 비밀번호로 잠겨 있으며, 과제의 AI 기능은 위 흐름으로 모두 확인할 수 있습니다.
