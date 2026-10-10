@@ -84,11 +84,7 @@ def demo_cases(today: date | None = None) -> list[dict]:
 
 class handler(JsonHandler):
     def handle_get(self):
-        try:
-            return {"ok": True, "cases": demo_cases()}
-        except Exception as e:  # 임시 진단
-            import traceback
-            return {"ok": True, "cases": [], "debug": traceback.format_exc()[-1500:]}
+        return {"ok": True, "cases": demo_cases()}
 
     def handle_post(self):
         b = self.read_json()
