@@ -30,7 +30,18 @@ PROGRAM_WORDS = re.compile(r"국민취업지원제도|국민취업지원|국취|
 
 
 def redact_programs(s: str) -> str:
-    return PROGRAM_WORDS.sub("[참여 사업 비공개]", s or "")
+    """채용 전 기업 화면용: 참여 사업명이 들어간 문장은 통째로 뺀다 ('[비공개]'로 남기면 참여 사실이 짐작되므로)."""
+    out = []
+    for line in (s or "").split("\n"):
+        parts = re.split(r"(?<=[.!?。])\s+", line)
+        kept = " ".join(p for p in parts if not PROGRAM_WORDS.search(p))
+        if kept.strip() or not line.strip():
+            out.append(kept)
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
+
+
+def has_program_words(s: str) -> bool:
+    return bool(PROGRAM_WORDS.search(s or ""))
 
 
 def parse_cert(c, form: dict, today: date) -> dict | None:

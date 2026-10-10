@@ -216,4 +216,5 @@ def test_employer_sees_points_with_program_names_hidden():
     out = employer.build({"posting": POST_FORM, "my_application": {"profile": prof}})
     me = [a for a in out["applicants"] if a["is_me"]][0]
     raw = json.dumps(me, ensure_ascii=False)
-    assert "청년도전" not in raw and "국민취업" not in raw and "React 웹앱 화면 구현" in me["points"]
+    assert "청년도전" not in raw and "국민취업" not in raw and "비공개" not in raw and me["points"] == ["React 웹앱 화면 구현"]
+    assert "React로 구현" in me["portfolio"]

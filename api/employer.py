@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from ai import generate_json, model_name, provider  # noqa: E402
 from common import ApiError, JsonHandler, text  # noqa: E402
 from match import guard  # noqa: E402
-from userinput import parse_posting, parse_seeker, posting_to_form, redact_programs  # noqa: E402
+from userinput import parse_posting, parse_seeker, posting_to_form, redact_programs, has_program_words  # noqa: E402
 from rules import judge, posting_check  # noqa: E402
 from synthetic import POSTINGS, applicants_for  # noqa: E402
 
@@ -38,7 +38,7 @@ def employer_view(applicant: dict, post: dict) -> dict:
     채용 전이므로 참여 사업명은 가리고, 사유·연령·참여 이력 자체는 넣지 않는다."""
     j = judge(applicant, post, applicant.get("consent", False))
     return {"id": applicant["id"], "alias": applicant["alias"], "headline": redact_programs(applicant["headline"]), "applied": applicant["applied"],
-            "points": [redact_programs(x) for x in applicant.get("points") or []][:8],
+            "points": [x for x in applicant.get("points") or [] if not has_program_words(x)][:8],
             "portfolio": redact_programs(applicant.get("portfolio") or ""),
             "badge": bool(j["badge"]), "is_me": applicant.get("is_me", False)}
 
