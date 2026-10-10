@@ -66,14 +66,15 @@ def generate_json(system: str, user: str, max_tokens: int = 1500) -> dict:
     if not p:
         raise ApiError(503, "ai_not_configured", "AI 기능이 아직 설정되지 않았습니다. (관리자: 환경 변수에 AI API 키 등록 필요)")
     if p == "claude":
-        base = os.environ.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
+        base = (os.environ.get("ANTHROPIC_BASE_URL") or "https://api.anthropic.com").strip().rstrip("/")
+        base = base[:-3] if base.endswith("/v1") else base  # 주소 끝에 /v1을 붙여 넣어도 동작하도록
         res = _post(f"{base}/v1/messages",
                     {"x-api-key": _key("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01"},
                     {"model": model_name(), "max_tokens": max_tokens, "system": system,
                      "messages": [{"role": "user", "content": user}]})
         out = "".join(b.get("text", "") for b in res.get("content", []))
     else:
-        base = os.environ.get("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com")
+        base = (os.environ.get("GEMINI_BASE_URL") or "https://generativelanguage.googleapis.com").strip().rstrip("/")
         res = _post(f"{base}/v1beta/models/{model_name()}:generateContent",
                     {"x-goog-api-key": _key("GEMINI_API_KEY")},
                     {"systemInstruction": {"parts": [{"text": system}]},

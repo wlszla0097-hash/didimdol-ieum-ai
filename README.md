@@ -78,7 +78,8 @@ API 키는 **코드·README·스크린샷에 절대 넣지 않고** 환경 변�
 |---|---|---|
 | `GEMINI_API_KEY` | 둘 중 하나 | [Google AI Studio](https://aistudio.google.com/apikey)에서 발급 |
 | `ANTHROPIC_API_KEY` | 둘 중 하나 | [Claude Console](https://console.anthropic.com/settings/keys)에서 발급. 둘 다 있으면 Claude 우선 |
-| `AI_MODEL` | 선택 | 모델 바꾸기. 기본값 Claude `claude-haiku-4-5-20251001`, Gemini `gemini-flash-latest` |
+| `ANTHROPIC_BASE_URL` | 선택 | Anthropic 호환 중계 서버 주소 (예: 교육용 게이트웨이 `https://copa.codyssey.kr`). 없으면 공식 API |
+| `AI_MODEL` | 선택 | 모델 바꾸기. 기본값 Claude `claude-haiku-4-5-20251001`, Gemini `gemini-flash-latest` (중계 서버는 그 서버의 모델 ID, 예: `claude-haiku-4`) |
 | `WORK24_KEY` | 선택 | 고용24 OpenAPI 인증키. 없으면 합성 공고로 동작 |
 | `WORK24_BASE_URL` | 선택 | 고용24 채용정보 엔드포인트 (승인 후 개발명세서 주소가 다르면 지정) |
 | `DATA_GO_KR_KEY` | 선택 | 공공데이터포털 인증키(Decoding). 지원사업 진단 화면용 |
