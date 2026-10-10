@@ -230,6 +230,33 @@ small.muted { font-weight: 400; }
   .applicant { flex-direction: column; align-items: stretch; }
 }
 
+
+/* 직접 입력 폼 */
+.example-bar { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-bottom: 10px; font-size: 13.5px; }
+.example-bar select { width: auto; max-width: 100%; padding: 7px 10px; font-size: 13.5px; }
+.prog-box { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; background: var(--bg); }
+.prog-box .sub { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.field label.check, label.check { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; margin: 4px 0; }
+label.check input { width: auto; accent-color: var(--brand); }
+table.acts { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 8px; }
+table.acts th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12.5px; border-bottom: 1px solid var(--line); padding: 6px 4px; }
+table.acts td { border-bottom: 1px solid var(--line); padding: 7px 4px; vertical-align: top; }
+table.acts td:first-child { white-space: nowrap; } table.acts td:last-child { white-space: nowrap; color: var(--muted); font-size: 13px; }
+.kind { font-size: 12px; background: var(--hl); color: var(--brand); padding: 1px 8px; border-radius: 6px; }
+#postCheck h3 { margin: 18px 0 8px; font-size: 16px; }
+
+
+/* 내부 모드 */
+.login { max-width: 420px; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+.tab { border: 0; background: none; font: inherit; font-weight: 700; color: var(--muted); padding: 10px 12px; cursor: pointer; text-decoration: none; border-bottom: 3px solid transparent; }
+.tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+.tab.right { margin-left: auto; font-weight: 500; }
+.batch-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+.batch-bar input[type="file"] { width: auto; flex: 1; min-width: 200px; }
+table.batch td:nth-child(2) { white-space: nowrap; }
+table.batch td:last-child { white-space: normal; }
+
 /* 반응형: 태블릿 */
 @media (max-width: 900px) {
   .grid2 { grid-template-columns: 1fr; }

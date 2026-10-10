@@ -1,16 +1,21 @@
-"""POST /api/diagnose — 기업 정보 → 공공데이터 후보 → AI 맞춤 진단·로드맵.
+"""POST /api/diagnose — 기업 정보 → 공공데이터 후보 → AI 맞춤 진단·로드맵. (내부 모드 전용: 로그인 토큰 필요)
+
+개인정보 보호: 업체명은 AI에 보내지 않고 'A사'로 바꾸며, 메모의 전화번호·주민번호·이메일은 지운다.
+입력·결과는 서버에 저장하지 않는다.
 
 할루시네이션 방지: AI는 서버가 넘긴 후보 목록 안에서만 고를 수 있고,
 목록에 없는 사업 ID를 답하면 서버가 버린다. 링크·사업명은 공공데이터 원본을 사용한다.
 """
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core"))  # 공용 모듈 위치
 
 from ai import generate_json, model_name, provider  # noqa: E402
-from common import ApiError, JsonHandler, text  # noqa: E402
+from auth import require  # noqa: E402
+from common import ApiError, JsonHandler, num, text  # noqa: E402
 from publicdata import load_programs, shortlist  # noqa: E402
 
 SIZES = ["5인 미만", "5~29인", "30~99인", "100~299인", "300인 이상"]
@@ -29,9 +34,30 @@ SYSTEM = """당신은 한국 고용지원사업 안내 보조자입니다. 아�
 recommendations는 최대 5개, roadmap은 최대 4단계입니다."""
 
 
+PII = [(re.compile(r"\d{6}\s*-\s*[1-4]\d{6}"), "[주민번호 삭제]"), (re.compile(r"01[016789][-\s]?\d{3,4}[-\s]?\d{4}"), "[전화번호 삭제]"),
+       (re.compile(r"\d{2,3}-\d{3,4}-\d{4}"), "[전화번호 삭제]"), (re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+"), "[이메일 삭제]")]
+COUNTS = {"insured_count": "고용보험 피보험자 수", "youth_count": "만 34세 이하 근로자 수", "fixed_term_count": "기간제·파견 근로자 수",
+          "senior_count": "만 60세 이상 근로자 수", "parental_count": "육아휴직(예정) 근로자 수"}
+
+
+def mask(textv: str, company: str) -> str:
+    """업체명 → 'A사', 전화·주민번호·이메일 삭제. AI로 보내기 전에 적용."""
+    out = textv
+    if company and len(company) >= 2:
+        out = out.replace(company, "A사")
+    for pat, rep in PII:
+        out = pat.sub(rep, out)
+    return out
+
+
 def validate_input(body: dict) -> dict:
+    company = text(body.get("company_name"), 40)
     p = {"industry": text(body.get("industry"), 40), "size": text(body.get("size"), 20), "region": text(body.get("region"), 20),
-         "current": text(body.get("current"), 200), "plan": text(body.get("plan"), 500)}
+         "current": mask(text(body.get("current"), 200), company), "plan": mask(text(body.get("plan"), 1000), company),
+         "masked": bool(company)}
+    for k in COUNTS:
+        v = num(body.get(k))
+        p[k] = int(v) if v is not None and 0 <= v < 100000 else None
     for f in FLAGS:
         p[f] = bool(body.get(f))
     if not p["industry"] or p["size"] not in SIZES:
@@ -46,7 +72,8 @@ def build_prompt(profile: dict, cands: list[dict]) -> str:
               "flexible_work": "유연근무(선택근무 등) 도입", "parental": "육아휴직·대체인력", "training": "직원 교육훈련", "keep_employment": "고용 유지·계속고용"}
     plans = [labels[f] for f in FLAGS if profile[f]]
     comp = {"업종": profile["industry"], "상시근로자": profile["size"], "지역": profile["region"] or "미입력",
-            "현재 참여 중인 지원사업": profile["current"] or "없음", "계획": plans, "추가 설명": profile["plan"] or "없음"}
+            "현재 참여 중인 지원사업": profile["current"] or "없음", "계획": plans, "추가 설명": profile["plan"] or "없음",
+            **{label: profile[k] for k, label in COUNTS.items() if profile.get(k) is not None}}
     cand = [{"id": c["서비스ID"], "사업명": c["서비스명"], "기관": c["소관기관명"], "요약": c["서비스목적요약"][:200],
              "지원대상": c["지원대상"][:300], "선정기준": c["선정기준"][:400], "지원내용": c["지원내용"][:300]} for c in cands]
     return f"[기업 정보]\n{json.dumps(comp, ensure_ascii=False)}\n\n[후보 목록]\n{json.dumps(cand, ensure_ascii=False)}"
@@ -80,6 +107,7 @@ def sanitize(ai: dict, cands: list[dict]) -> tuple[dict, int]:
 
 class handler(JsonHandler):
     def handle_post(self):
+        require(self.headers.get("x-internal-token"))
         profile = validate_input(self.read_json())
         programs, source = load_programs()
         cands = shortlist(programs, profile)
@@ -88,4 +116,4 @@ class handler(JsonHandler):
         if not result["recommendations"]:
             raise ApiError(502, "ai_empty", "추천 결과를 만들지 못했습니다. 입력을 조금 더 구체적으로 적어 다시 시도하세요.")
         return {"ok": True, "result": result, "meta": {"data_source": source, "candidates": len(cands),
-                "dropped_unverified": dropped, "ai": provider(), "model": model_name()}}
+                "dropped_unverified": dropped, "ai": provider(), "model": model_name(), "masked": profile["masked"]}}

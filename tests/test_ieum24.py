@@ -16,10 +16,13 @@ import pytest  # noqa: E402
 import cases as case  # noqa: E402
 import employer  # noqa: E402
 import rules  # noqa: E402
+import userinput as profile  # noqa: E402
+import auth  # noqa: E402
+import diagnose  # noqa: E402
 import seeker  # noqa: E402
 from common import ApiError  # noqa: E402
 from match import guard  # noqa: E402
-from synthetic import persona, posting  # noqa: E402
+from synthetic import posting  # noqa: E402
 
 SEOUL = {"region": "서울 마포구", "emp_type": "정규직", "priority": True}
 GUMI = {"region": "경북 구미시", "emp_type": "정규직", "priority": True}
@@ -57,10 +60,16 @@ def test_non_capital_and_non_regular_show_no_badge():
     assert not rules.judge(who([DOJEON]), {**SEOUL, "priority": False}, True)["badge"]
 
 
+PROFILE = {"experience": "웹 개발 과정 수료 (HTML, CSS, JavaScript, React), 팀 프로젝트 화면 담당", "job": "웹 개발", "region": "서울",
+           "kuchwi": True, "kuchwi_qualified": "2026-04-20", "kuchwi_iap": True, "youth": True, "consent": True}
+POST_FORM = {"company": "테스트랩", "sido": "서울", "sigungu": "마포구", "title": "웹 프론트엔드 개발자", "job": "웹 개발",
+             "emp_type": "정규직", "wage": 2800000, "insured": 18, "priority": "예", "description": "React, JavaScript 개발"}
+
+
 def test_employer_view_hides_reason_and_age():
-    out = employer.build({"posting_id": "JOB-01", "my_application": {"persona_id": "P-01", "consent": True}})
+    out = employer.build({"posting": POST_FORM, "my_application": {"profile": PROFILE}})
     raw = json.dumps(out["applicants"], ensure_ascii=False)
-    for word in ("국민취업", "청년도전", "age", "programs", "insurance", "reason"):
+    for word in ("국민취업", "청년도전", "age", "programs", "insurance", "reason", "youth"):
         assert word not in raw
     assert [a["applied"] for a in out["applicants"]] == sorted(a["applied"] for a in out["applicants"])  # 지원일 순 고정
     me = [a for a in out["applicants"] if a["is_me"]][0]
@@ -90,20 +99,64 @@ def test_ai_guard(text, ok):
     assert (guard(text, "웹 개발 과정 480시간") is not None) is ok
 
 
-def test_seeker_works_without_ai_and_excludes_arrears():
-    out = seeker.run(seeker.validate_input({"persona_id": "P-03", "consent": True}))
-    assert out["meta"]["ai_used"] is False and out["competencies"]
+def test_seeker_user_input_without_ai():
+    out = seeker.run(profile.parse_seeker({**PROFILE, "region": "무관", "job": "품질", "experience": "품질관리 실무 과정, 측정기 사용, QC 도구"}))
+    assert out["meta"]["ai_used"] is False and out["activities"] and out["competencies"]
     assert "JOB-10" not in [j["id"] for j in out["jobs"]] and out["meta"]["excluded"]["arrears"] == 1
+
+
+def test_seeker_input_validation():
+    for bad in ({**PROFILE, "experience": ""}, {**PROFILE, "job": ""}, {**PROFILE, "kuchwi_qualified": ""},
+                {**PROFILE, "kuchwi_qualified": "2099-01-01"}, {**PROFILE, "region": "화성"}):
+        with pytest.raises(ApiError):
+            profile.parse_seeker(bad)
+
+
+def test_user_profile_rules():
+    p = profile.parse_seeker(PROFILE)
+    assert rules.judge(p, SEOUL, True)["badge"] is True
+    assert rules.judge(profile.parse_seeker({**PROFILE, "kuchwi_job_after": True}), SEOUL, True)["eligible"] is False
+    assert rules.judge(profile.parse_seeker({**PROFILE, "kuchwi_iap": False}), SEOUL, True)["eligible"] is False
+    assert rules.judge(profile.parse_seeker({**PROFILE, "youth": False}), SEOUL, True)["eligible"] is False
+
+
+def test_posting_discrimination_and_validation():
+    post = profile.parse_posting({**POST_FORM, "description": "30세 이하, 남성 우대"})
+    items = {i["item"]: i["level"] for i in rules.posting_check(post)["items"]}
+    assert items["채용 차별 소지 표현"] == "확인 필요"
     with pytest.raises(ApiError):
-        seeker.validate_input({"persona_id": ""})
+        profile.parse_posting({**POST_FORM, "sido": ""})
+
+
+def test_internal_auth(monkeypatch):
+    monkeypatch.delenv("INTERNAL_PASSWORD", raising=False)
+    with pytest.raises(ApiError):
+        auth.login("x")
+    monkeypatch.setenv("INTERNAL_PASSWORD", "pw-1234")
+    with pytest.raises(ApiError):
+        auth.login("wrong")
+    tok = auth.login("pw-1234")["token"]
+    auth.require(tok)
+    with pytest.raises(ApiError):
+        auth.require(tok[:-2] + "xx")
+    monkeypatch.setenv("INTERNAL_PASSWORD", "changed")
+    with pytest.raises(ApiError):
+        auth.require(tok)  # 비밀번호 변경 시 기존 토큰 무효
+
+
+def test_diagnose_masks_company_and_pii():
+    p = diagnose.validate_input({"company_name": "디딤정밀", "industry": "제조업", "size": "5~29인", "hire_youth": True,
+                                 "plan": "디딤정밀 대표 010-1234-5678, 내년 청년 2명 채용"})
+    assert "디딤정밀" not in p["plan"] and "010" not in p["plan"] and "A사" in p["plan"]
 
 
 def test_case_discloses_reason_only_with_consent():
-    post = posting("JOB-01")
-    me = {**persona("P-01"), "id": "JOB-01-ME", "alias": "김○○"}
+    post = profile.parse_posting(POST_FORM)
     hire = date(2026, 10, 12)
-    assert case.build_case(post, {**me, "consent": True}, hire)["evidence"]["open"] is True
-    closed = case.build_case(post, {**me, "consent": False}, hire)["evidence"]
+    me = case.resolve_applicant(post, "CUSTOM-ME", {"profile": PROFILE})
+    assert case.build_case(post, me, hire)["evidence"]["open"] is True
+    me2 = case.resolve_applicant(post, "CUSTOM-ME", {"profile": {**PROFILE, "consent": False}})
+    closed = case.build_case(post, me2, hire)["evidence"]
     assert closed["open"] is False and not any("국민취업" in line for line in closed["lines"])
 
 

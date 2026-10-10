@@ -24,7 +24,7 @@
       <a href="#seeker" data-route="seeker">구직자</a>
       <a href="#employer" data-route="employer">기업</a>
       <a href="#officer" data-route="officer">주무관</a>
-      <a href="#diagnose" data-route="diagnose">지원사업 진단</a>
+      <a href="#internal" data-route="internal">🔒 내부</a>
       <a href="#about" data-route="about">안내</a>
       <button class="theme-btn" id="themeBtn" aria-label="다크 모드 전환">🌙</button>
     </nav>
@@ -51,13 +51,13 @@
       <div class="lanes">
         <div class="lane-name">구직자</div>
         <ol class="lane">
-          <li><span>①</span><b>참여 이력 불러오기</b><small>국취·청년도전·훈련 이력</small></li>
-          <li><span>②</span><b>AI 역량 문장 · 공고 추천</b><small>실제 공고 목록 안에서만</small></li>
+          <li><span>①</span><b>참여 이력·경험 입력</b><small>국취·청년도전·훈련·프로젝트를 직접 작성</small></li>
+          <li><span>②</span><b>AI 이력 정리 · 공고 추천</b><small>활동 정리·역량 문장, 실제 공고 안에서만</small></li>
           <li><span>③</span><b>표시 동의 · 지원</b><small>본인이 켜고 끌 수 있음</small></li>
         </ol>
         <div class="lane-name biz">기업</div>
         <ol class="lane biz">
-          <li><span>④</span><b>공고 점검</b><small>정규직·규모·소재지·최저임금</small></li>
+          <li><span>④</span><b>공고 입력 · 점검</b><small>요건 규칙 점검 + AI 공고 정리</small></li>
           <li><span>⑤</span><b>지원자 표시 확인</b><small>사유·연령 비공개, 정렬·필터 없음</small></li>
           <li><span>⑥</span><b>근로계약 점검 · 신청 알림</b><small>채용 확정 후</small></li>
         </ol>
@@ -82,28 +82,46 @@
   <!-- 2. 구직자 -->
   <section id="seeker" class="page" data-page="seeker" hidden>
     <div class="wrap">
-      <header class="page-head"><p class="eyebrow">① ② ③ 구직자 · AI 기능</p><h1>수료 후 취업 연계</h1><p>참여 이력을 불러오면 AI가 직무 역량 문장과 자기소개 초안을 만들고, 실제 공고 목록 안에서 맞는 공고를 추천합니다.</p></header>
+      <header class="page-head"><p class="eyebrow">① ② ③ 구직자 · AI 기능</p><h1>수료 후 취업 연계</h1><p>내 경험을 자유롭게 적으면 AI가 활동별로 정리하고, 직무 역량 문장·자기소개 초안을 만들어 실제 공고 목록 안에서 맞는 공고를 추천합니다.</p></header>
       <div class="grid2">
         <form id="seekForm" class="panel" novalidate>
-          <fieldset class="field"><legend>1. 참여 이력 불러오기 <em>*</em> <small class="muted">(시연용 합성 인물)</small></legend>
-            <div class="personas" id="personas"><div class="skeleton small"></div></div>
+          <div class="example-bar"><span class="muted">처음이라면</span> <select id="seekExample" aria-label="예시 불러오기"><option value="">예시 불러오기…</option></select></div>
+          <fieldset class="field"><legend>1. 참여한 고용서비스 <small class="muted">(해당하는 것 모두)</small></legend>
+            <div class="prog-box">
+              <label class="check"><input type="checkbox" id="kuchwi" name="kuchwi"> <b>국민취업지원제도</b></label>
+              <div class="sub" data-for="kuchwi" hidden>
+                <div class="row2">
+                  <div class="field"><label for="kuchwi_qualified">수급자격 인정일 <em>*</em></label><input type="date" id="kuchwi_qualified" name="kuchwi_qualified"></div>
+                  <div class="field"><label>&nbsp;</label><label class="check"><input type="checkbox" id="kuchwi_iap" name="kuchwi_iap"> 취업활동계획(IAP) 수립함</label></div>
+                </div>
+                <label class="check"><input type="checkbox" id="kuchwi_job_after" name="kuchwi_job_after"> 참여 이후 취업(고용보험 가입)한 적 있음</label>
+              </div>
+            </div>
+            <div class="prog-box">
+              <label class="check"><input type="checkbox" id="dojeon" name="dojeon"> <b>청년도전지원사업</b></label>
+              <div class="sub" data-for="dojeon" hidden>
+                <div class="field"><label for="dojeon_completed">수료일 <em>*</em></label><input type="date" id="dojeon_completed" name="dojeon_completed"></div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" id="youth" name="youth" checked> 만 15~34세 청년입니다 <small class="muted">(나이는 저장·전송하지 않고 해당 여부만 사용)</small></label>
           </fieldset>
+          <div class="field"><label for="experience">2. 내 경험 <em>*</em> <small class="muted">훈련·상담·프로젝트·자격·아르바이트 등 자유롭게</small></label>
+            <textarea id="experience" name="experience" rows="7" maxlength="1500" placeholder="예)&#10;- 내일배움카드 웹 개발 과정 수료 (HTML, CSS, JavaScript), 2026년 9월&#10;- 팀 프로젝트로 동네 맛집 지도 웹사이트 제작, 화면 담당&#10;- 카페 아르바이트 1년 — 재고 정리, 고객 응대"></textarea><span class="counter" data-for="experience">0/1500</span></div>
           <div class="row2">
-            <div class="field"><label for="job">2. 희망 직무</label><input id="job" name="job" maxlength="30" placeholder="예: 웹 개발"></div>
+            <div class="field"><label for="job">3. 희망 직무 <em>*</em></label><input id="job" name="job" maxlength="30" placeholder="예: 웹 개발"></div>
             <div class="field"><label for="sregion">희망 지역</label>
-              <select id="sregion" name="region"><option>서울</option><option>경기</option><option>인천</option><option>부산</option><option>대구</option><option>경북</option><option>무관</option></select></div>
+              <select id="sregion" name="region"><option>서울</option><option>경기</option><option>인천</option><option>부산</option><option>대구</option><option>광주</option><option>대전</option><option>울산</option><option>세종</option><option>강원</option><option>충북</option><option>충남</option><option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option><option selected>무관</option></select></div>
           </div>
-          <div class="field"><label for="extra">추가 경험 (선택)</label><textarea id="extra" name="extra" rows="2" maxlength="300" placeholder="예: 동아리에서 홈페이지 운영 1년"></textarea><span class="counter" data-for="extra">0/300</span></div>
           <div class="consent">
-            <label><input type="checkbox" id="consent" name="consent"> <b>3. ‘지원제도 활용 가능’ 표시에 동의</b></label>
+            <label><input type="checkbox" id="consent" name="consent"> <b>4. ‘지원제도 활용 가능’ 표시에 동의</b></label>
             <p>동의하면 내가 지원한 기업의 지원자 화면에 <b>“채용 시 활용 가능한 정부지원제도 있음”</b>만 표시됩니다. 어떤 사업에 참여했는지, 나이는 기업에 보이지 않으며, 사유는 <b>채용 확정 후 신청 단계</b>에서만 동의 범위 안에서 전달됩니다. 언제든 끌 수 있습니다.</p>
           </div>
           <p class="msg" id="seekMsg" role="alert" hidden></p>
           <button class="btn primary block" id="seekBtn" type="submit">AI로 이력 정리 · 공고 추천</button>
-          <p class="fine">시연은 합성 데이터로 동작합니다. 실제 개인정보는 입력하지 마세요.</p>
+          <p class="fine">입력 내용은 저장되지 않습니다. 성명·연락처·주민번호 같은 개인정보는 적지 마세요. 참여 이력은 본인 입력값이며, 실제 서비스에서는 고용24 이력으로 확인합니다.</p>
         </form>
         <div class="panel result" id="seekResult" aria-live="polite">
-          <div class="empty"><span>🧭</span><p>왼쪽에서 참여 이력을 고르고<br>[AI로 이력 정리 · 공고 추천]을 누르세요.</p></div>
+          <div class="empty"><span>🧭</span><p>왼쪽에 내 경험을 적고<br>[AI로 이력 정리 · 공고 추천]을 누르세요.</p></div>
         </div>
       </div>
     </div>
@@ -112,12 +130,32 @@
   <!-- 3. 기업 -->
   <section id="employer" class="page" data-page="employer" hidden>
     <div class="wrap">
-      <header class="page-head"><p class="eyebrow">④ ⑤ ⑥ 기업</p><h1>공고 점검 · 지원자 확인 · 채용 확정</h1><p>우리 공고로 채용하면 어떤 지원제도와 연계할 수 있는지 미리 점검하고, 채용 확정 시 근로계약 조건과 신청 시기를 확인합니다.</p></header>
-      <form id="postForm" class="panel inline-form" novalidate>
-        <div class="field grow"><label for="postSel">④ 우리 회사 공고 <small class="muted">(시연용 합성 공고)</small></label><select id="postSel"><option value="">불러오는 중…</option></select></div>
-        <button class="btn primary" id="postBtn" type="submit">공고 점검</button>
+      <header class="page-head"><p class="eyebrow">④ ⑤ ⑥ 기업 · AI 기능</p><h1>공고 점검 · 지원자 확인 · 채용 확정</h1><p>우리 회사 공고를 입력하면 규칙엔진이 지원제도 연계 요건을 점검하고, AI가 공고를 정리해 요구 역량과 보완점을 알려 줍니다.</p></header>
+      <form id="postForm" class="panel" novalidate>
+        <div class="example-bar"><span class="muted">처음이라면</span> <select id="postExample" aria-label="예시 공고 불러오기"><option value="">예시 공고 불러오기…</option></select></div>
+        <div class="row3">
+          <div class="field"><label for="p_company">회사명 <small class="muted">(가명 가능)</small></label><input id="p_company" name="company" maxlength="40" placeholder="예: ○○정밀"></div>
+          <div class="field"><label for="p_sido">근무지 시·도 <em>*</em></label><select id="p_sido" name="sido"><option value="">선택</option><option>서울</option><option>경기</option><option>인천</option><option>부산</option><option>대구</option><option>광주</option><option>대전</option><option>울산</option><option>세종</option><option>강원</option><option>충북</option><option>충남</option><option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option></select></div>
+          <div class="field"><label for="p_sigungu">시·군·구</label><input id="p_sigungu" name="sigungu" maxlength="15" placeholder="예: 상주시"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label for="p_title">공고 제목 <em>*</em></label><input id="p_title" name="title" maxlength="60" placeholder="예: 품질관리 신입 사원"></div>
+          <div class="field"><label for="p_job">직무 <em>*</em></label><input id="p_job" name="job" maxlength="30" placeholder="예: 생산·품질"></div>
+          <div class="field"><label for="p_emp">고용형태 <em>*</em></label><select id="p_emp" name="emp_type"><option>정규직</option><option>계약직</option><option>기타</option></select></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label for="p_wage">월 임금(원) <em>*</em></label><input inputmode="numeric" id="p_wage" name="wage" placeholder="예: 2,500,000"></div>
+          <div class="field"><label for="p_hours">주 소정근로시간</label><input inputmode="decimal" id="p_hours" name="weekly_hours" placeholder="40"></div>
+          <div class="field"><label for="p_insured">고용보험 피보험자 수</label><input inputmode="numeric" id="p_insured" name="insured" placeholder="예: 12"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label for="p_priority">우선지원대상기업</label><select id="p_priority" name="priority"><option>예</option><option>아니오</option><option selected>모름</option></select></div>
+        </div>
+        <div class="field"><label for="p_desc">공고 본문 <small class="muted">(업무 내용·우대 기술·근무 조건 등 — AI가 정리)</small></label>
+          <textarea id="p_desc" name="description" rows="5" maxlength="1500" placeholder="예) 생산 제품의 치수 측정과 검사 기록을 담당합니다. 측정기 사용 경험, 엑셀 가능자 우대. 주 5일, 08:30~17:30."></textarea><span class="counter" data-for="p_desc">0/1500</span></div>
+        <p class="msg" id="postMsg" role="alert" hidden></p>
+        <button class="btn primary block" id="postBtn" type="submit">공고 점검 · AI 정리</button>
       </form>
-      <p class="msg" id="postMsg" role="alert" hidden></p>
       <div class="grid2 top-gap" id="empArea" hidden>
         <div class="panel" id="postCheck"></div>
         <div class="panel" id="applicants"></div>
@@ -175,38 +213,80 @@
     </div>
   </section>
 
-  <!-- 2. AI 기업 진단 -->
-  <section id="diagnose" class="page" data-page="diagnose" hidden>
+  <!-- 5. 내부 모드: 지원사업 진단 (디딤돌파트너스 전용) -->
+  <section id="internal" class="page" data-page="internal" hidden>
     <div class="wrap">
-      <header class="page-head"><p class="eyebrow">확장 2단계 미리보기 · AI</p><h1>기업 지원사업 진단</h1><p>채용 이후 이어서 받을 수 있는 지원사업(정규직 전환·일생활균형 등)과 연계 로드맵을 안내합니다. <a href="#programs">전체 지원사업 목록 보기 →</a></p></header>
-      <div class="grid2">
-        <form id="diagForm" class="panel" novalidate>
-          <div class="field"><label for="industry">업종 <em>*</em></label><input id="industry" name="industry" maxlength="40" placeholder="예: 제조업, 도소매업, IT서비스"></div>
-          <div class="row2">
-            <div class="field"><label for="size">상시근로자 수 <em>*</em></label>
-              <select id="size" name="size"><option value="">선택</option><option>5인 미만</option><option>5~29인</option><option>30~99인</option><option>100~299인</option><option>300인 이상</option></select></div>
-            <div class="field"><label for="region">지역</label><input id="region" name="region" maxlength="20" placeholder="예: 경북 상주"></div>
-          </div>
-          <fieldset class="field"><legend>올해 계획 (하나 이상) <em>*</em></legend>
-            <div class="chips">
-              <label><input type="checkbox" name="hire_youth"> 청년 채용</label>
-              <label><input type="checkbox" name="convert_regular"> 정규직 전환</label>
-              <label><input type="checkbox" name="flexible_work"> 유연근무 도입</label>
-              <label><input type="checkbox" name="hire_senior"> 고령자 채용·계속고용</label>
-              <label><input type="checkbox" name="parental"> 육아휴직·대체인력</label>
-              <label><input type="checkbox" name="hire_disabled"> 장애인 채용</label>
-              <label><input type="checkbox" name="training"> 직원 교육훈련</label>
-              <label><input type="checkbox" name="keep_employment"> 고용 유지</label>
+      <header class="page-head"><p class="eyebrow">🔒 내부 모드 · 디딤돌파트너스 전용</p><h1>고객사 지원사업 진단</h1><p>고객사 정보를 입력하거나 엑셀(CSV)로 올리면, 공공데이터 후보 안에서 AI가 맞춤 지원사업과 연계 로드맵을 정리합니다. 업체명은 AI에 보내지 않고 'A사'로 바꾸며, 입력·결과는 서버에 저장하지 않습니다.</p></header>
+
+      <form id="loginForm" class="panel login" novalidate>
+        <div class="field"><label for="ipw">내부 비밀번호</label><input type="password" id="ipw" autocomplete="current-password" maxlength="100"></div>
+        <p class="msg" id="loginMsg" role="alert" hidden></p>
+        <button class="btn primary block" id="loginBtn" type="submit">로그인</button>
+        <p class="fine">로그인은 8시간 유지되며 이 브라우저 탭을 닫으면 해제됩니다.</p>
+      </form>
+
+      <div id="internalApp" hidden>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="one" type="button" role="tab">한 업체 진단</button>
+          <button class="tab" data-tab="batch" type="button" role="tab">여러 업체 일괄 진단 (CSV)</button>
+          <a class="tab" href="#programs">지원사업 목록</a>
+          <button class="tab right" id="logoutBtn" type="button">로그아웃</button>
+        </div>
+
+        <div class="grid2" data-pane="one">
+          <form id="diagForm" class="panel" novalidate>
+            <div class="row2">
+              <div class="field"><label for="company_name">업체명 <small class="muted">(AI에는 'A사'로 전송)</small></label><input id="company_name" name="company_name" maxlength="40" placeholder="예: ○○정밀"></div>
+              <div class="field"><label for="industry">업종 <em>*</em></label><input id="industry" name="industry" maxlength="40" placeholder="예: 제조업, 도소매업, IT서비스"></div>
             </div>
-          </fieldset>
-          <div class="field"><label for="current">현재 참여 중인 지원사업</label><input id="current" name="current" maxlength="200" placeholder="예: 청년일자리도약장려금 (없으면 비워두세요)"></div>
-          <div class="field"><label for="plan">추가 설명</label><textarea id="plan" name="plan" maxlength="500" rows="3" placeholder="예: 내년 상반기 생산직 청년 2명 채용, 기존 기간제 1명 정규직 전환 예정"></textarea><span class="counter" data-for="plan">0/500</span></div>
-          <p class="msg" id="diagMsg" role="alert" hidden></p>
-          <button class="btn primary block" id="diagBtn" type="submit">AI 진단 받기</button>
-          <p class="fine">개인정보(성명·주민번호 등)는 입력하지 마세요. 입력 내용은 저장되지 않습니다.</p>
-        </form>
-        <div class="panel result" id="diagResult" aria-live="polite">
-          <div class="empty"><span>🔎</span><p>왼쪽에 기업 정보를 입력하면<br>이곳에 진단 결과가 표시됩니다.</p></div>
+            <div class="row2">
+              <div class="field"><label for="size">상시근로자 수 <em>*</em></label>
+                <select id="size" name="size"><option value="">선택</option><option>5인 미만</option><option>5~29인</option><option>30~99인</option><option>100~299인</option><option>300인 이상</option></select></div>
+              <div class="field"><label for="region">지역</label><input id="region" name="region" maxlength="20" placeholder="예: 경북 상주"></div>
+            </div>
+            <fieldset class="field"><legend>근로자 구성 <small class="muted">(아는 것만)</small></legend>
+              <div class="row3">
+                <div class="field"><label for="insured_count">피보험자 수</label><input inputmode="numeric" id="insured_count" name="insured_count"></div>
+                <div class="field"><label for="youth_count">만 34세 이하</label><input inputmode="numeric" id="youth_count" name="youth_count"></div>
+                <div class="field"><label for="fixed_term_count">기간제·파견</label><input inputmode="numeric" id="fixed_term_count" name="fixed_term_count"></div>
+                <div class="field"><label for="senior_count">만 60세 이상</label><input inputmode="numeric" id="senior_count" name="senior_count"></div>
+                <div class="field"><label for="parental_count">육아휴직(예정)</label><input inputmode="numeric" id="parental_count" name="parental_count"></div>
+              </div>
+            </fieldset>
+            <fieldset class="field"><legend>올해 계획 (하나 이상) <em>*</em></legend>
+              <div class="chips">
+                <label><input type="checkbox" name="hire_youth"> 청년 채용</label>
+                <label><input type="checkbox" name="convert_regular"> 정규직 전환</label>
+                <label><input type="checkbox" name="flexible_work"> 유연근무 도입</label>
+                <label><input type="checkbox" name="hire_senior"> 고령자 채용·계속고용</label>
+                <label><input type="checkbox" name="parental"> 육아휴직·대체인력</label>
+                <label><input type="checkbox" name="hire_disabled"> 장애인 채용</label>
+                <label><input type="checkbox" name="training"> 직원 교육훈련</label>
+                <label><input type="checkbox" name="keep_employment"> 고용 유지</label>
+              </div>
+            </fieldset>
+            <div class="field"><label for="current">현재 참여 중인 지원사업</label><input id="current" name="current" maxlength="200" placeholder="예: 청년일자리도약장려금 (없으면 비워두세요)"></div>
+            <div class="field"><label for="plan">상담 메모</label><textarea id="plan" name="plan" maxlength="1000" rows="4" placeholder="예: 내년 상반기 생산직 청년 2명 채용, 기존 기간제 1명 정규직 전환 예정, 선택근무제 검토 중"></textarea><span class="counter" data-for="plan">0/1000</span></div>
+            <p class="msg" id="diagMsg" role="alert" hidden></p>
+            <button class="btn primary block" id="diagBtn" type="submit">AI 진단 받기</button>
+            <p class="fine">근로자 성명·주민번호는 적지 마세요. 메모의 전화번호·주민번호·이메일은 자동으로 지운 뒤 AI에 보냅니다.</p>
+          </form>
+          <div class="panel result" id="diagResult" aria-live="polite">
+            <div class="empty"><span>🔎</span><p>왼쪽에 고객사 정보를 입력하면<br>이곳에 진단 결과가 표시됩니다.</p></div>
+          </div>
+        </div>
+
+        <div class="panel" data-pane="batch" hidden>
+          <h2 class="panel-title">여러 업체 일괄 진단</h2>
+          <p class="muted">엑셀에서 <b>CSV(UTF-8)</b>로 저장해 올리세요. 첫 줄은 제목 행입니다. 파일은 이 브라우저 안에서만 읽고, 업체마다 한 번씩 진단을 요청합니다 (업체당 약 10~15초).</p>
+          <div class="batch-bar">
+            <button class="btn ghost" id="tplBtn" type="button">양식(CSV) 내려받기</button>
+            <input type="file" id="csvFile" accept=".csv,text/csv" aria-label="CSV 파일 선택">
+            <button class="btn primary" id="batchBtn" type="button" disabled>일괄 진단 시작</button>
+            <button class="btn ghost" id="batchDl" type="button" hidden>결과 CSV 내려받기</button>
+          </div>
+          <p class="msg" id="batchMsg" role="alert" hidden></p>
+          <div id="batchTable"></div>
         </div>
       </div>
     </div>
@@ -215,7 +295,7 @@
   <!-- 3. 지원사업 찾기 -->
   <section id="programs" class="page" data-page="programs" hidden>
     <div class="wrap">
-      <header class="page-head"><p class="eyebrow">공공데이터</p><h1>지원사업 찾기</h1><p>행정안전부 공공서비스(혜택) 정보에서 사업주 대상 고용지원사업을 모았습니다.</p></header>
+      <header class="page-head"><p class="eyebrow">🔒 내부 모드 · 공공데이터</p><h1>지원사업 찾기</h1><p>행정안전부 공공서비스(혜택) 정보에서 사업주 대상 고용지원사업을 모았습니다.</p></header>
       <form id="searchForm" class="search" role="search"><input id="q" maxlength="40" placeholder="검색어 (예: 청년, 유연근무, 육아)" aria-label="지원사업 검색어"><button class="btn primary">검색</button></form>
       <p class="src" id="progSrc"></p>
       <div class="cards list" id="progList"><div class="skeleton"></div><div class="skeleton"></div></div>
@@ -228,10 +308,10 @@
       <header class="page-head"><p class="eyebrow">About</p><h1>서비스 안내</h1></header>
       <h2 class="sec-title">이렇게 동작합니다</h2>
       <ol class="flow">
-        <li><b>참여 이력 불러오기</b> — 본인 동의 후 고용24의 참여·훈련·고용보험 이력을 불러옵니다. (시연은 합성 데이터)</li>
-        <li><b>규칙으로 공고 선별</b> — 희망 직무·지역·훈련 기술로 코드가 공고 후보를 고르고, 임금체불 명단공개 사업주와 마감 공고는 뺍니다.</li>
-        <li><b>AI 번역</b> — AI가 이력을 직무 역량 문장·자기소개 초안으로 바꾸고, 후보 공고 안에서만 추천 이유를 씁니다.</li>
-        <li><b>서버 검증</b> — 후보에 없는 공고, 지원금·연령 언급, 입력에 없던 숫자가 나온 문장은 서버가 차단하고 기본 문장으로 바꿉니다.</li>
+        <li><b>직접 입력</b> — 구직자는 참여한 고용서비스(선택·날짜)와 경험(자유 서술)을, 기업은 공고 조건과 본문을 입력합니다. 실제 서비스에서는 본인 동의 후 고용24 이력으로 확인합니다.</li>
+        <li><b>규칙으로 공고 선별</b> — 작성한 경험 속 기술·희망 직무·지역으로 코드가 공고 후보를 고르고, 임금체불 명단공개 사업주와 마감 공고는 뺍니다.</li>
+        <li><b>AI 정리</b> — AI가 자유 서술을 활동별로 정리하고 직무 역량 문장·자기소개 초안·추천 이유를 씁니다. 기업 공고는 요약·요구 역량·보완 제안으로 정리합니다.</li>
+        <li><b>서버 검증</b> — 후보에 없는 공고, 지원금·연령 언급, 입력에 없던 숫자가 나온 문장, 공고 본문에 없는 요구 역량은 서버가 차단합니다.</li>
         <li><b>규칙엔진 판단</b> — ‘지원제도 활용 가능’ 표시 여부는 2026년 청년일자리도약장려금 지침 1-3항을 옮긴 규칙이 판단합니다.</li>
       </ol>
       <h2 class="sec-title">자주 묻는 질문</h2>
@@ -242,10 +322,10 @@
       <h2 class="sec-title">데이터 출처</h2>
       <ul class="sources">
         <li>고용24 OpenAPI 채용정보 — 이용 승인 후 연동 (현재 합성 공고로 시연)</li>
-        <li>행정안전부_대한민국 공공서비스(혜택) 정보 — 공공데이터포털(data.go.kr), 지원사업 진단 화면</li>
+        <li>행정안전부_대한민국 공공서비스(혜택) 정보 — 공공데이터포털(data.go.kr), 내부 모드 지원사업 진단</li>
         <li>2026년 청년일자리도약장려금 사업운영 지침 — 고용노동부</li>
         <li>최저임금 고시(2024~2026년), 근로기준법·최저임금법·기간제법 조문</li>
-        <li>참여 이력·고용보험 이력·지원자·공고 — 자체 생성 합성 데이터 (실제 개인정보 미사용)</li>
+        <li>예시 입력값·추천 대상 공고·가상 지원자 — 자체 생성 합성 데이터 (실제 개인정보 미사용)</li>
       </ul>
       <p class="status" id="status">연동 상태 확인 중…</p>
     </div>

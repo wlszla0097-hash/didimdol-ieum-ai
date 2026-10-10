@@ -1,16 +1,18 @@
-"""GET /api/programs?q=키워드 — 사업주 대상 고용지원사업 목록 (공공데이터, AI 미사용)."""
+"""GET /api/programs?q=키워드 — 사업주 대상 고용지원사업 목록 (공공데이터, AI 미사용). 내부 모드 전용."""
 import os
 import sys
 from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core"))  # 공용 모듈 위치
 
+from auth import require  # noqa: E402
 from common import JsonHandler, text  # noqa: E402
 from publicdata import load_programs, search  # noqa: E402
 
 
 class handler(JsonHandler):
     def handle_get(self):
+        require(self.headers.get("x-internal-token"))
         q = text(parse_qs(urlparse(self.path).query).get("q", [""])[0], 40)
         programs, source = load_programs()
         found = search(programs, q)

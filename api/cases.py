@@ -1,6 +1,6 @@
 """채용 확정 → 신청 건(주무관 확인 보조 화면용).
 
-POST /api/cases {"posting_id", "applicant_id", "hire_date", "contract": {...근로조건}, "my_application": {...}}
+POST /api/cases {"posting": {...공고 입력}, "applicant_id", "hire_date", "contract": {...근로조건}, "my_application": {"profile": {...}}}
 GET  /api/cases 시연용 신청 건 목록
 
 - 근로계약 조건은 규칙엔진(labor.py)으로 점검하고, 공고 점검 항목·고용유지 기간·신청 가능일을 함께 정리한다.
@@ -16,16 +16,19 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from common import ApiError, JsonHandler, num, text  # noqa: E402
 from labor import check as contract_check  # noqa: E402
 from rules import BAD, CHECK, GUIDE_YOUTH, d, history_flags, judge, posting_check, schedule  # noqa: E402
-from synthetic import applicants_for, persona, posting  # noqa: E402
+from userinput import parse_posting, parse_seeker  # noqa: E402
+from synthetic import applicants_for, posting  # noqa: E402
 
 CONTRACT_KEYS = ("employment_type", "wage_type", "start_date", "end_date", "base_wage", "allowances", "weekly_hours", "daily_hours", "break_minutes")
 HAS_KEYS = ("has_holiday", "has_leave", "has_place", "has_job", "has_payday")
 
 
 def resolve_applicant(post: dict, aid: str, mine: dict | None) -> dict | None:
-    if aid.endswith("-ME") and isinstance(mine, dict):
-        me = persona(text(mine.get("persona_id"), 10))
-        return {**me, "id": aid, "alias": f"{me['alias'][0]}○○", "consent": bool(mine.get("consent"))} if me else None
+    if aid.endswith("-ME"):
+        if not isinstance(mine, dict) or not isinstance(mine.get("profile"), dict):
+            return None
+        me = parse_seeker(mine["profile"])
+        return {**me, "id": aid, "alias": "구직자 화면 작성자(시연)"}
     return next((a for a in applicants_for(post) if a["id"] == aid), None)
 
 
@@ -88,9 +91,9 @@ class handler(JsonHandler):
 
     def handle_post(self):
         b = self.read_json()
-        post = posting(text(b.get("posting_id"), 10))
-        if not post:
-            raise ApiError(400, "missing_input", "공고를 선택하세요.")
+        if not isinstance(b.get("posting"), dict):
+            raise ApiError(400, "missing_input", "공고를 먼저 점검하세요.")
+        post = parse_posting(b["posting"])
         app = resolve_applicant(post, text(b.get("applicant_id"), 20), b.get("my_application"))
         if not app:
             raise ApiError(400, "missing_input", "채용할 지원자를 선택하세요.")

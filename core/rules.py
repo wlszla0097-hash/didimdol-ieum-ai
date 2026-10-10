@@ -120,6 +120,12 @@ def posting_check(post: dict) -> dict:
         add(BAD, "임금체불 명단공개", "명단공개 사업주에 해당 — 지원 제한 대상 여부 확인, 구직자 추천에서 제외", "고용24 임금체불 명단공개 사업주 여부")
     elif post.get("arrears") is False:
         add(OK, "임금체불 명단공개", "해당 없음", "고용24 임금체불 명단공개 사업주 여부")
+    else:
+        add(INFO, "임금체불 명단공개", "고용24 OpenAPI 연동 후 자동 확인", "고용24 임금체불 명단공개 사업주 여부")
+
+    if post.get("discrim"):
+        add(CHECK, "채용 차별 소지 표현", "공고에 '" + "', '".join(post["discrim"]) + "' 표현 — 합리적 이유 없는 연령·성별 제한은 금지되므로 삭제·수정 검토",
+            "고용상 연령차별금지법 제4조의4, 남녀고용평등법 제7조")
 
     bad = sum(1 for i in items if i["level"] == BAD)
     chk = sum(1 for i in items if i["level"] == CHECK)
