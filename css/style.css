@@ -1,4 +1,4 @@
-/* 지원사업 이음 AI — 색상은 변수로 관리 (다크 모드 대응) */
+/* 이음24 — 색상은 변수로 관리 (다크 모드 대응) */
 :root {
   --bg: #f6f8fc; --surface: #ffffff; --text: #18202e; --muted: #5b6577; --line: #dfe5ef;
   --brand: #1846c9; --brand-2: #0f2f8f; --accent: #12a37f; --hl: #e8efff;
@@ -139,6 +139,96 @@ summary { font-weight: 700; cursor: pointer; }
 .sources li { margin-bottom: 4px; }
 .status { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 24px; }
 .footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; padding: 20px 0 28px; }
+
+
+/* ===== 이음24 화면 ===== */
+.muted { color: var(--muted); }
+small.muted { font-weight: 400; }
+.top-gap { margin-top: 16px; }
+.panel-title { font-size: 18px; margin: 0 0 6px; }
+.badge.충족 { background: var(--ok-bg); color: var(--ok); }
+.badge.미충족 { background: var(--bad-bg); color: var(--bad); }
+.badge.안내 { background: var(--hl); color: var(--brand); }
+.badge.검토대기 { background: var(--ok-bg); color: var(--ok); }
+.badge.보완필요 { background: var(--bad-bg); color: var(--bad); }
+/* '지원제도 활용 가능' 표시 */
+.eum { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+  background: var(--ok-bg); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent); white-space: nowrap; }
+
+/* 홈 흐름도 */
+.lanes { display: grid; grid-template-columns: 90px 1fr; gap: 10px 14px; align-items: center; }
+.lane-name { font-weight: 800; color: var(--brand); }
+.lane-name.biz { color: var(--warn); } .lane-name.gov { color: var(--accent); }
+.lane { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.lane.one { grid-template-columns: 1fr; }
+.lane li { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: 12px; padding: 12px 14px; position: relative; }
+.lane.biz li { border-left-color: var(--warn); } .lane.gov li { border-left-color: var(--accent); }
+.lane li span { color: var(--muted); font-weight: 800; margin-right: 6px; }
+.lane li small { display: block; color: var(--muted); font-size: 13px; }
+
+/* 구직자 */
+.personas { display: grid; gap: 8px; }
+.persona { display: block; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px 8px 36px; position: relative; cursor: pointer; background: var(--bg); font-weight: 400 !important; }
+.persona input { position: absolute; left: 12px; top: 13px; width: auto; accent-color: var(--brand); }
+.persona:has(input:checked) { border-color: var(--brand); background: var(--hl); }
+.persona .p-top small { color: var(--muted); }
+.persona ul { margin: 4px 0 0; padding-left: 16px; font-size: 13px; color: var(--muted); }
+.consent { border: 1px dashed var(--brand); border-radius: 12px; padding: 12px 14px; margin: 4px 0 12px; }
+.consent label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.consent input { width: auto; accent-color: var(--brand); }
+.consent p { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.comps { padding-left: 18px; } .comps li { margin-bottom: 6px; } .comps small { display: block; color: var(--muted); font-size: 12.5px; }
+.job { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+.job-head { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+.job h3 { margin: 0; font-size: 17px; }
+.job .agency { color: var(--muted); font-size: 13px; margin: 2px 0 6px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.tags span { font-size: 12px; background: var(--hl); color: var(--brand); padding: 1px 8px; border-radius: 6px; }
+.job p { margin: 4px 0; } .job .next { font-weight: 600; }
+.mine { font-size: 13px; background: var(--bg); border-radius: 10px; padding: 8px 10px; margin-top: 8px; color: var(--muted); }
+.mine.yes { background: var(--ok-bg); color: var(--text); }
+.mine b { color: var(--text); margin-right: 4px; }
+.job-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
+.job-actions .btn { padding: 9px 14px; font-size: 14px; }
+.skeleton.small { height: 90px; }
+
+/* 기업 */
+.inline-form { display: flex; gap: 12px; align-items: end; }
+.inline-form .grow { flex: 1; margin: 0; }
+.verdict { border-radius: 10px; padding: 10px 12px; margin: 8px 0; font-size: 15px; }
+.verdict.적정 { background: var(--ok-bg); color: var(--ok); } .verdict.확인필요 { background: var(--warn-bg); color: var(--warn); } .verdict.위반의심 { background: var(--bad-bg); color: var(--bad); }
+.note { font-size: 13px; background: var(--hl); border-radius: 10px; padding: 10px 12px; }
+.applicant { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.applicant.me { background: var(--hl); border-radius: 10px; padding: 12px; }
+.applicant .btn { padding: 8px 12px; font-size: 14px; white-space: nowrap; }
+.sched { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.sched div { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.sched small { display: block; color: var(--muted); font-size: 12px; }
+.evidence { border-left: 4px solid var(--ok); background: var(--ok-bg); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.evidence.closed { border-left-color: var(--muted); background: var(--bg); color: var(--muted); }
+.evidence ul { margin: 4px 0 0; padding-left: 18px; }
+#checkResult h3 { margin: 16px 0 8px; }
+
+/* 주무관 */
+.cases { display: grid; gap: 16px; }
+.case header { display: flex; justify-content: space-between; gap: 10px; align-items: start; margin-bottom: 10px; }
+.case h3 { margin: 2px 0; font-size: 18px; } .case h4 { margin: 10px 0 6px; font-size: 14.5px; }
+.case.fresh { outline: 2px solid var(--brand); }
+.case footer { display: flex; justify-content: space-between; gap: 10px; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 10px; flex-wrap: wrap; }
+.case footer .btn { padding: 8px 14px; font-size: 14px; }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 12px 18px; border-radius: 12px;
+  box-shadow: var(--shadow); z-index: 50; max-width: min(560px, calc(100% - 32px)); font-size: 14px; }
+.toast a { color: var(--accent); font-weight: 700; }
+
+@media (max-width: 900px) {
+  .lanes { grid-template-columns: 1fr; } .lane { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .inline-form { flex-direction: column; align-items: stretch; }
+  .sched { grid-template-columns: 1fr; }
+  .applicant { flex-direction: column; align-items: stretch; }
+}
 
 /* 반응형: 태블릿 */
 @media (max-width: 900px) {

@@ -11,4 +11,5 @@ from common import JsonHandler  # noqa: E402
 class handler(JsonHandler):
     def handle_get(self):
         return {"ok": True, "ai": provider() or "not_configured", "model": model_name() if provider() else None,
-                "public_data": "configured" if os.environ.get("DATA_GO_KR_KEY") else "sample_only"}
+                "public_data": "configured" if os.environ.get("DATA_GO_KR_KEY") else "sample_only",
+                "work24": "configured" if os.environ.get("WORK24_KEY") else "synthetic"}
