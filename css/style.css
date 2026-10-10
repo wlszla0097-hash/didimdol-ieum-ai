@@ -233,7 +233,7 @@ small.muted { font-weight: 400; }
 
 /* 직접 입력 폼 */
 .example-bar { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-bottom: 10px; font-size: 13.5px; }
-.example-bar select { width: auto; max-width: 100%; padding: 7px 10px; font-size: 13.5px; }
+.example-bar select { width: auto; min-width: 0; flex: 0 1 auto; max-width: 100%; padding: 7px 10px; font-size: 13.5px; text-overflow: ellipsis; }
 .prog-box { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; background: var(--bg); }
 .prog-box .sub { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
 .field label.check, label.check { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; margin: 4px 0; }
@@ -286,7 +286,21 @@ details.consent-log ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted
 ul.points { margin: 6px 0; padding-left: 18px; font-size: 13.5px; }
 details.pf { padding: 6px 10px; margin: 4px 0 6px; font-size: 13.5px; }
 details.pf pre { white-space: pre-wrap; font-family: inherit; margin: 6px 0 0; color: var(--text); }
-@media (max-width: 720px) { details.policy dl { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  details.policy dl { grid-template-columns: 1fr; }
+  details.policy, details.consent-log { padding-left: 0; }
+  .example-bar { justify-content: stretch; flex-wrap: wrap; }
+  .example-bar select { flex: 1 1 100%; }
+  .job-head { flex-wrap: wrap; }
+  table.acts td:first-child, table.acts td:last-child { white-space: normal; }
+  .cert-row input[type="file"] { min-width: 0; }
+  .tabs .tab { padding: 8px; }
+}
+
+/* 좁은 화면에서 내용 때문에 칸이 넓어지지 않게 */
+fieldset { min-width: 0; }
+.panel, .grid2 > *, .job, .applicant > div, .case { min-width: 0; }
+.job p, .mine, .applicant, table.acts td { overflow-wrap: anywhere; }
 
 /* 반응형: 태블릿 */
 @media (max-width: 900px) {
