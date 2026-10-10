@@ -24,11 +24,34 @@ def _date(v, label: str, today: date) -> str:
     return day.isoformat()
 
 
+CONSENT_VERSION = "2026-10-10-v1"
+# 채용 전 기업 화면에 보내는 글에서 가리는 표현 (참여 사업 = 지원제도 사유)
+PROGRAM_WORDS = re.compile(r"국민취업지원제도|국민취업지원|국취|청년도전지원사업|청년도전|취업활동계획|수급자격")
+
+
+def redact_programs(s: str) -> str:
+    return PROGRAM_WORDS.sub("[참여 사업 비공개]", s or "")
+
+
+def parse_cert(c, form: dict, today: date) -> dict | None:
+    """수료증 AI 판독값(본인이 확인한 것) → 폼 값과 일치하는지 표시. 판단 자체는 폼 값으로 한다."""
+    if not isinstance(c, dict) or not c.get("program"):
+        return None
+    prog, day = text(c.get("program"), 20), d(c.get("date"))
+    if prog not in ("청년도전지원사업", "국민취업지원제도", "기타") or (day and day > today):
+        return None
+    target = {"청년도전지원사업": form.get("dojeon_completed"), "국민취업지원제도": form.get("kuchwi_qualified")}.get(prog)
+    return {"program": prog, "date": day.isoformat() if day else "", "issuer": text(c.get("issuer"), 40), "course": text(c.get("course"), 80),
+            "matched": bool(day and target and day.isoformat() == str(target)[:10])}
+
+
 def parse_seeker(b: dict, today: date | None = None) -> dict:
     """구직자 입력 → person(dict). 연령은 '청년 여부'만 받고 숫자 나이는 받지 않는다."""
     today = today or date.today()
     if not isinstance(b, dict):
         raise ApiError(400, "bad_json", "요청 형식이 올바르지 않습니다.")
+    if not b.get("agree_privacy"):
+        raise ApiError(400, "need_consent", "[필수] 개인정보 수집·이용에 동의해야 이용할 수 있습니다.")
     exp = text(b.get("experience"), 1500)
     job = text(b.get("job"), 30)
     region = text(b.get("region"), 10) or "무관"
@@ -51,9 +74,15 @@ def parse_seeker(b: dict, today: date | None = None) -> dict:
     if b.get("dojeon"):
         programs.append({"type": "청년도전지원사업", "completed": _date(b.get("dojeon_completed"), "청년도전지원사업 수료일", today), "status": "수료"})
     youth = bool(b.get("youth"))
+    points = [text(x, 160) for x in (b.get("points") or [])[:8] if text(x, 160)] if isinstance(b.get("points"), list) else []
     return {"id": "ME", "alias": text(b.get("alias"), 10) or "나", "youth": youth, "age": 25 if youth else 40,  # age는 규칙 계산용 대표값
             "programs": programs, "insurance": insurance, "experience": exp, "extra": "",
-            "desire": {"job": job, "region": region}, "consent": bool(b.get("consent"))}
+            "desire": {"job": job, "region": region},
+            "consent": bool(b.get("consent")),                 # [선택] 지원제도 활용 가능 표시 공개
+            "ai_consent": bool(b.get("agree_ai")),             # [필수: AI 기능] 처리위탁·국외이전 고지 동의
+            "detail_consent": bool(b.get("agree_detail")),     # [선택] 채용 확정 후 세부정보 열람
+            "cert": parse_cert(b.get("cert"), b, today) if b.get("agree_cert") else None,
+            "points": points, "portfolio": text(b.get("portfolio"), 4000)}
 
 
 def seeker_history_lines(p: dict) -> list[str]:

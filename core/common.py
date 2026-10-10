@@ -48,9 +48,9 @@ class JsonHandler(BaseHTTPRequestHandler):
             print("[server error]", repr(e))
             self._send(500, {"ok": False, "error": "server_error", "message": "서버 처리 중 오류가 발생했습니다. 잠시 후 다시 시도하세요."})
 
-    def read_json(self) -> dict:
+    def read_json(self, max_body: int = MAX_BODY) -> dict:
         length = int(self.headers.get("content-length") or 0)
-        if length > MAX_BODY:
+        if length > max_body:
             raise ApiError(413, "too_large", "입력 내용이 너무 깁니다. 줄여서 다시 시도하세요.")
         try:
             data = json.loads(self.rfile.read(length) or b"{}")

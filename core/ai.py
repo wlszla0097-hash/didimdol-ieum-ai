@@ -60,8 +60,11 @@ def _post(url: str, headers: dict, body: dict) -> dict:
         raise ApiError(502, "ai_unreachable", "AI 서비스에 연결하지 못했습니다. 잠시 후 다시 시도하세요.")
 
 
-def generate_json(system: str, user: str, max_tokens: int = 1500) -> dict:
-    """AI에게 JSON 하나를 받아 dict로 돌려준다."""
+def generate_json(system: str, user: str, max_tokens: int = 1500, file: dict | None = None) -> dict:
+    """AI에게 JSON 하나를 받아 dict로 돌려준다.
+
+    file: {"media_type": "image/png|image/jpeg|application/pdf", "data": base64 문자열} — 수료증 판독용 (선택)
+    """
     p = provider()
     if not p:
         raise ApiError(503, "ai_not_configured", "AI 기능이 아직 설정되지 않았습니다. (관리자: 환경 변수에 AI API 키 등록 필요)")
@@ -71,18 +74,27 @@ def generate_json(system: str, user: str, max_tokens: int = 1500) -> dict:
         res = _post(f"{base}/v1/messages",
                     {"x-api-key": _key("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01"},
                     {"model": model_name(), "max_tokens": max_tokens, "system": system,
-                     "messages": [{"role": "user", "content": user}]})
+                     "messages": [{"role": "user", "content": _claude_content(user, file)}]})
         out = "".join(b.get("text", "") for b in res.get("content", []))
     else:
         base = (os.environ.get("GEMINI_BASE_URL") or "https://generativelanguage.googleapis.com").strip().rstrip("/")
         res = _post(f"{base}/v1beta/models/{model_name()}:generateContent",
                     {"x-goog-api-key": _key("GEMINI_API_KEY")},
                     {"systemInstruction": {"parts": [{"text": system}]},
-                     "contents": [{"role": "user", "parts": [{"text": user}]}],
+                     "contents": [{"role": "user", "parts": ([{"inline_data": {"mime_type": file["media_type"], "data": file["data"]}}] if file else [])
+                                   + [{"text": user}]}],
                      "generationConfig": {"maxOutputTokens": max_tokens, "responseMimeType": "application/json", "temperature": 0.2}})
         cands = res.get("candidates") or []
         out = "".join(p.get("text", "") for p in ((cands[0].get("content") or {}).get("parts") or [])) if cands else ""
     return parse_json(out)
+
+
+def _claude_content(user: str, file: dict | None):
+    if not file:
+        return user
+    kind = "document" if file["media_type"] == "application/pdf" else "image"
+    return [{"type": kind, "source": {"type": "base64", "media_type": file["media_type"], "data": file["data"]}},
+            {"type": "text", "text": user}]
 
 
 def parse_json(out: str) -> dict:

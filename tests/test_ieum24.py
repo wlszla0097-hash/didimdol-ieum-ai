@@ -19,6 +19,7 @@ import rules  # noqa: E402
 import userinput as profile  # noqa: E402
 import auth  # noqa: E402
 import diagnose  # noqa: E402
+import certificate  # noqa: E402
 import seeker  # noqa: E402
 from common import ApiError  # noqa: E402
 from match import guard  # noqa: E402
@@ -61,7 +62,8 @@ def test_non_capital_and_non_regular_show_no_badge():
 
 
 PROFILE = {"experience": "웹 개발 과정 수료 (HTML, CSS, JavaScript, React), 팀 프로젝트 화면 담당", "job": "웹 개발", "region": "서울",
-           "kuchwi": True, "kuchwi_qualified": "2026-04-20", "kuchwi_iap": True, "youth": True, "consent": True}
+           "kuchwi": True, "kuchwi_qualified": "2026-04-20", "kuchwi_iap": True, "youth": True, "consent": True,
+           "agree_privacy": True, "agree_detail": True}
 POST_FORM = {"company": "테스트랩", "sido": "서울", "sigungu": "마포구", "title": "웹 프론트엔드 개발자", "job": "웹 개발",
              "emp_type": "정규직", "wage": 2800000, "insured": 18, "priority": "예", "description": "React, JavaScript 개발"}
 
@@ -155,7 +157,7 @@ def test_case_discloses_reason_only_with_consent():
     hire = date(2026, 10, 12)
     me = case.resolve_applicant(post, "CUSTOM-ME", {"profile": PROFILE})
     assert case.build_case(post, me, hire)["evidence"]["open"] is True
-    me2 = case.resolve_applicant(post, "CUSTOM-ME", {"profile": {**PROFILE, "consent": False}})
+    me2 = case.resolve_applicant(post, "CUSTOM-ME", {"profile": {**PROFILE, "agree_detail": False}})
     closed = case.build_case(post, me2, hire)["evidence"]
     assert closed["open"] is False and not any("국민취업" in line for line in closed["lines"])
 
@@ -183,3 +185,35 @@ def test_guard_number_formats():
 def test_min_wage_posting_not_recommended():
     out = seeker.run(profile.parse_seeker({**PROFILE, "experience": "엑셀로 재고 관리, 사무 보조 경험", "job": "사무", "region": "서울"}))
     assert "JOB-09" not in [j["id"] for j in out["jobs"]] and out["meta"]["excluded"]["min_wage"] == 1
+
+
+def test_privacy_consent_required_and_ai_gate():
+    with pytest.raises(ApiError):
+        profile.parse_seeker({**PROFILE, "agree_privacy": False})
+    out = seeker.run(profile.parse_seeker({**PROFILE, "agree_ai": False}))
+    assert out["meta"]["ai_used"] is False and "AI 서버로 전송되지 않았습니다" in out["meta"]["ai_error"]
+
+
+def test_cert_evidence_and_match():
+    p = profile.parse_seeker({**PROFILE, "agree_cert": True, "cert": {"program": "국민취업지원제도", "date": "2026-04-20", "issuer": "고용센터"}})
+    assert p["cert"]["matched"] is True
+    assert any("AI 판독 날짜" in e for e in rules.history_flags(p)["evidence"])
+    p2 = profile.parse_seeker({**PROFILE, "agree_cert": False, "cert": {"program": "국민취업지원제도", "date": "2026-04-20"}})
+    assert p2["cert"] is None  # 판독 동의가 없으면 증빙값을 쓰지 않음
+
+
+def test_certificate_requires_consent_and_type():
+    with pytest.raises(ApiError):
+        certificate.read({"media_type": "image/png", "data": "aGVsbG8=", "consent": False})
+    with pytest.raises(ApiError):
+        certificate.read({"media_type": "text/plain", "data": "aGVsbG8=", "consent": True})
+    assert certificate.classify("2026년 청년도전 지원사업", "") == "청년도전지원사업"
+    assert certificate.classify("", "국민취업지원제도 직업훈련") == "국민취업지원제도"
+
+
+def test_employer_sees_points_with_program_names_hidden():
+    prof = {**PROFILE, "points": ["청년도전지원사업 프로그램 수료", "React 웹앱 화면 구현"], "portfolio": "국민취업지원제도 상담으로 목표를 세웠습니다.\nReact로 구현"}
+    out = employer.build({"posting": POST_FORM, "my_application": {"profile": prof}})
+    me = [a for a in out["applicants"] if a["is_me"]][0]
+    raw = json.dumps(me, ensure_ascii=False)
+    assert "청년도전" not in raw and "국민취업" not in raw and "React 웹앱 화면 구현" in me["points"]

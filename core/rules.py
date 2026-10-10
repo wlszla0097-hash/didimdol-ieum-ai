@@ -48,6 +48,11 @@ def history_flags(person: dict, before: date | None = None) -> dict:
         if p.get("type") == "청년도전지원사업" and d(p.get("completed")) and (before is None or d(p["completed"]) < before):
             flags["dojeon_completed"] = True
             flags["evidence"].append(f"청년도전지원사업 수료({p['completed']})")
+    c = person.get("cert")
+    if c and c.get("matched"):
+        flags["evidence"].append(f"증빙 첨부: {c['program']} 서류({c.get('issuer') or '발급기관 미판독'}) — AI 판독 날짜 {c['date']}가 입력값과 일치")
+    elif c:
+        flags["evidence"].append(f"증빙 첨부: {c['program']} 서류 — AI 판독값이 입력값과 다름, 원본 확인 필요")
     return flags
 
 

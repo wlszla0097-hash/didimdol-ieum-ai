@@ -10,7 +10,7 @@ const won = (n) => (n || n === 0 ? `${Number(n).toLocaleString("ko-KR")}원` : "
 const EUM = '<span class="eum">✓ 지원제도 활용 가능</span>';
 
 // 화면 사이에서 이어지는 시연 상태 (새로고침하면 초기화 — 개인정보를 브라우저에 남기지 않음)
-const state = { seekExamples: [], profile: null, headline: "", application: null, postExamples: [], post: null, postInput: null, filledFor: null, hireTarget: null, sessionCases: [], token: null, batchOut: null };
+const state = { seekExamples: [], profile: null, headline: "", application: null, postExamples: [], post: null, postInput: null, filledFor: null, hireTarget: null, sessionCases: [], token: null, batchOut: null, consentLog: [], points: [], portfolio: "", cert: null };
 
 /* ---------- 1. 화면 이동 (해시 라우팅) ---------- */
 const ROUTES = ["home", "seeker", "employer", "officer", "internal", "programs", "about"];
@@ -86,13 +86,59 @@ $$("textarea[maxlength]").forEach((ta) => ta.addEventListener("input", () => {
 
 const fmt = (n) => (n || n === 0 ? Number(n).toLocaleString("ko-KR") : "");
 /* ---------- 3. 구직자: 직접 쓴 경험 → AI 정리·역량 문장·공고 추천 ---------- */
-const SEEK_FIELDS = ["kuchwi", "kuchwi_qualified", "kuchwi_iap", "kuchwi_job_after", "dojeon", "dojeon_completed", "youth", "experience", "job", "region", "consent"];
+const SEEK_FIELDS = ["kuchwi", "kuchwi_qualified", "kuchwi_iap", "kuchwi_job_after", "dojeon", "dojeon_completed", "youth", "experience", "job", "region",
+  "consent", "agree_privacy", "agree_ai", "agree_detail", "agree_cert"];
+const CONSENT_VERSION = "2026-10-10-v1";
 const seekEl = (k) => $(`#seekForm [name="${k}"]`);
 function readSeekForm() {
   const f = {};
   SEEK_FIELDS.forEach((k) => { const el = seekEl(k); f[k] = el.type === "checkbox" ? el.checked : el.value.trim(); });
+  f.cert = f.agree_cert ? state.cert : null;            // 본인이 확인한 판독값 (판단은 폼 값으로)
+  f.points = state.points || [];                         // 정리된 활동 = 기업 화면 핵심 포인트
+  f.portfolio = state.portfolio || "";
   return f;
 }
+
+/* 동의 기록·철회 (이 탭 안에만 기록) */
+function logConsent(item, agreed) {
+  state.consentLog.unshift({ item, action: agreed ? "동의" : "철회", at: new Date().toLocaleString("ko-KR"), version: CONSENT_VERSION });
+  $("#consentLog").innerHTML = state.consentLog.map((c) => `<li><b>${esc(c.action)}</b> ${esc(c.item)} · ${esc(c.at)} · 문구 ${esc(c.version)}</li>`).join("");
+}
+$$("#seekForm [data-consent]").forEach((el) => el.addEventListener("change", () => {
+  logConsent(el.dataset.consent, el.checked);
+  if (el.name === "agree_privacy" && !el.checked) {            // 필수 동의 철회 → 입력·결과 삭제
+    ["experience", "kuchwi_qualified", "dojeon_completed", "job"].forEach((k) => (seekEl(k).value = ""));
+    Object.assign(state, { profile: null, points: [], portfolio: "", cert: null, headline: "" });
+    $("#certResult").innerHTML = "";
+    $("#seekResult").innerHTML = '<div class="empty"><span>🗑</span><p>개인정보 수집·이용 동의를 철회해<br>입력 내용과 결과를 삭제했습니다.</p></div>';
+  }
+  if (el.name === "agree_cert" && !el.checked) { state.cert = null; $("#certResult").innerHTML = ""; }
+}));
+
+/* 증빙 서류 판독: AI는 읽기만 하고, 값은 본인이 확인한 뒤 폼에 남는다 */
+const toBase64 = (file) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = rej; r.readAsDataURL(file); });
+$("#certBtn").addEventListener("click", async () => {
+  const out = $("#certResult"), file = $("#certFile").files[0];
+  if (!seekEl("agree_cert").checked) return (out.innerHTML = '<p class="msg error">[선택] 증빙 서류 AI 판독에 동의해야 읽을 수 있어요. 동의하지 않으면 날짜를 직접 입력하세요.</p>');
+  if (!file) return (out.innerHTML = '<p class="msg error">필수값을 입력하세요: 증빙 파일</p>');
+  if (file.size > 3 * 1024 * 1024) return (out.innerHTML = '<p class="msg error">파일이 너무 큽니다. 3MB 이하로 올려 주세요.</p>');
+  const btn = $("#certBtn"); btn.disabled = true; btn.textContent = "읽는 중…";
+  out.innerHTML = '<p class="muted">AI가 서류를 읽고 있어요 (10초 안팎)…</p>';
+  try {
+    const r = await api("/api/certificate", { method: "POST", timeoutMs: 45000, body: { media_type: file.type, data: await toBase64(file), consent: true } });
+    state.cert = { program: r.program, date: r.date, issuer: r.issuer, course: r.course };
+    if (r.program === "청년도전지원사업") { seekEl("dojeon").checked = true; if (r.date) seekEl("dojeon_completed").value = r.date; }
+    if (r.program === "국민취업지원제도") { seekEl("kuchwi").checked = true; if (r.date) seekEl("kuchwi_qualified").value = r.date; }
+    syncProgramBoxes();
+    out.innerHTML = `<div class="cert-read ${r.readable ? "" : "warn"}"><b>AI 판독 결과</b> (${esc(r.doc_type || "서류")})
+      <ul><li>사업: <b>${esc(r.program)}</b> ${r.program_text ? `(서류 표기: ${esc(r.program_text)})` : ""}</li>
+      ${r.course ? `<li>과정: ${esc(r.course)}</li>` : ""}${r.issuer ? `<li>발급기관: ${esc(r.issuer)}</li>` : ""}
+      <li>${esc(r.date_label || "날짜")}: <b>${esc(r.date || "읽지 못함")}</b></li></ul>
+      <small>${r.program === "기타" ? "국민취업지원제도·청년도전지원사업 서류로 확인되지 않았어요. 위 체크는 바꾸지 않았습니다." : "위 칸에 채웠어요."} ${esc(r.note)}</small></div>`;
+  } catch (err) {
+    out.innerHTML = `<p class="msg error">${esc(err.message)}</p>`;
+  } finally { btn.disabled = false; btn.textContent = "AI로 읽기"; }
+});
 function fillForm(root, values, names) {
   names.forEach((k) => {
     const el = $(`[name="${k}"]`, root); if (!el || !(k in values)) return;
@@ -125,6 +171,7 @@ $("#seekForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const msg = $("#seekMsg"), body = readSeekForm();
   $$(".invalid", $("#seekForm")).forEach((el) => el.classList.remove("invalid"));
+  if (!body.agree_privacy) return showMsg(msg, "[필수] 개인정보 수집·이용에 동의해 주세요. (아래 4번 항목)");
   const need = [["experience", "내 경험"], ["job", "희망 직무"]];
   if (body.kuchwi) need.push(["kuchwi_qualified", "국민취업지원제도 수급자격 인정일"]);
   if (body.dojeon) need.push(["dojeon_completed", "청년도전지원사업 수료일"]);
@@ -140,7 +187,8 @@ $("#seekForm").addEventListener("submit", async (e) => {
   try {
     const data = await api("/api/seeker", { method: "POST", body,
       onSlow: () => (out.innerHTML = loadingHtml("AI 응답이 평소보다 늦어지고 있어요. 조금만 기다려 주세요 (최대 45초)")) });
-    state.profile = body;
+    state.points = data.activities.map((a) => a.name);
+    state.profile = { ...body, points: state.points };
     state.headline = data.competencies[0]?.text || "";
     renderSeeker(data);
   } catch (err) {
@@ -183,7 +231,27 @@ function renderSeeker({ activities, competencies, resume_intro, jobs, programs, 
     ${meta.no_match ? `<div class="msg info">작성한 경험·희망 직무와 맞는 공고가 아직 없어요. 희망 직무를 바꾸거나 경험에 사용한 도구·기술을 더 적어 보세요.</div>` : ""}
     ${jobs.length && !meta.consent ? `<div class="msg info">‘지원제도 활용 가능’ 표시에 동의하지 않아 기업에는 아무 표시도 보이지 않아요.</div>` : ""}
     ${cards}
-    <p class="meta">공고 출처: ${meta.postings_source === "live" ? "고용24 채용정보 실시간" : "합성 공고(고용24 OpenAPI 승인 전 시연)"} · 제외: 임금체불 명단공개 ${ex.arrears}건, 최저임금 미달 ${ex.min_wage || 0}건, 마감 ${ex.closed}건</p>`;
+    <p class="meta">공고 출처: ${meta.postings_source === "live" ? "고용24 채용정보 실시간" : "합성 공고(고용24 OpenAPI 승인 전 시연)"} · 제외: 임금체불 명단공개 ${ex.arrears}건, 최저임금 미달 ${ex.min_wage || 0}건, 마감 ${ex.closed}건</p>
+    <h3>📄 내 포트폴리오</h3>
+    <p class="muted">위에서 정리된 활동으로 AI가 초안을 한 번만 만들고, 직접 고쳐서 등록합니다. 기업은 <b>핵심 포인트</b>를 먼저 보고, 필요할 때만 전체를 펼칩니다. 참여 사업명은 기업 화면에서 자동으로 가려집니다.</p>
+    <div class="pf-actions"><button class="btn ghost" id="pfAi" type="button">AI 초안 만들기</button><span class="muted" id="pfMsg"></span></div>
+    <textarea id="pfText" rows="10" maxlength="4000" placeholder="직접 작성하거나 [AI 초안 만들기]를 누르세요.">${esc(state.portfolio || "")}</textarea>
+    <button class="btn primary block" id="pfSave" type="button">포트폴리오 등록</button>`;
+  $("#pfAi").addEventListener("click", async () => {
+    const b = $("#pfAi"), m = $("#pfMsg"), body = readSeekForm();
+    if (!body.agree_ai) return (m.textContent = "AI 처리 동의(4번 두 번째 항목)가 필요해요. 직접 작성해도 됩니다.");
+    b.disabled = true; m.textContent = "AI가 초안을 쓰고 있어요…";
+    try {
+      const r = await api("/api/seeker", { method: "POST", body: { ...body, action: "portfolio" } });
+      $("#pfText").value = r.portfolio;
+      m.textContent = `초안 완료 · 원문에 없는 내용으로 차단된 문단 ${r.meta.guard_blocked}개 · 고친 뒤 등록하세요.`;
+    } catch (err) { m.textContent = err.message; } finally { b.disabled = false; }
+  });
+  $("#pfSave").addEventListener("click", () => {
+    state.portfolio = $("#pfText").value.trim();
+    if (state.profile) state.profile.portfolio = state.portfolio;
+    toast(state.portfolio ? "포트폴리오를 등록했어요. 지원한 기업 화면에서 핵심 포인트와 함께 보입니다." : "포트폴리오를 비웠어요.");
+  });
   $$(".apply", $("#seekResult")).forEach((b) => b.addEventListener("click", () => {
     state.application = { posting_id: b.dataset.id };
     b.textContent = "지원 완료 ✓"; b.disabled = true;
@@ -240,7 +308,7 @@ async function runPostCheck() {
   $("#empArea").scrollIntoView({ behavior: "smooth", block: "start" });
   try {
     const data = await api("/api/employer", { method: "POST",
-      body: { posting: body, my_application: state.profile && { profile: state.profile, headline: state.headline } } });
+      body: { posting: body, my_application: state.profile && { profile: { ...state.profile, portfolio: state.portfolio || "" }, headline: state.headline } } });
     state.post = data.posting; state.postInput = data.posting_input;
     renderPostCheck(data);
   } catch (err) {
@@ -274,7 +342,10 @@ function renderPostCheck({ posting, check, analysis, ai_error, applicants, note 
     <p class="note">${esc(note)}</p>
     ${applicants.map((a) => `
       <div class="applicant ${a.is_me ? "me" : ""}">
-        <div><b>${esc(a.alias)}</b> ${a.badge ? EUM : ""}<br><span class="muted">${esc(a.headline)}</span><br><small class="muted">지원일 ${esc(a.applied)}</small></div>
+        <div><b>${esc(a.alias)}</b> ${a.badge ? EUM : ""}<br><span class="muted">${esc(a.headline)}</span>
+          ${a.points.length ? `<ul class="points">${a.points.slice(0, 4).map((p) => `<li>${esc(p)}</li>`).join("")}</ul>` : ""}
+          ${a.portfolio ? `<details class="pf"><summary>포트폴리오 전체 보기</summary><pre>${esc(a.portfolio)}</pre></details>` : ""}
+          <small class="muted">지원일 ${esc(a.applied)}</small></div>
         <button class="btn ghost hire" type="button" data-id="${esc(a.id)}" data-alias="${esc(a.alias)}">채용 확정</button>
       </div>`).join("")}
     ${state.profile ? "" : `<p class="meta">구직자 화면에서 이력을 작성하면 그 내용이 이 목록에 시연용 지원자로 추가됩니다.</p>`}

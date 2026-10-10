@@ -103,6 +103,18 @@
                 <div class="field"><label for="dojeon_completed">수료일 <em>*</em></label><input type="date" id="dojeon_completed" name="dojeon_completed"></div>
               </div>
             </div>
+            <div class="cert-box">
+              <p class="cert-title"><b>증빙 첨부 (선택)</b> <small class="muted">수료증·참여확인서를 올리면 AI가 사업명과 날짜를 읽어 위 칸을 채워 줍니다. 판단은 규칙엔진이 합니다.</small></p>
+              <label class="check"><input type="checkbox" name="agree_cert" data-consent="증빙 서류 AI 판독(선택)"> <span><b class="opt">[선택]</b> 증빙 서류를 AI로 판독하는 데 동의합니다.</span></label>
+              <details class="policy"><summary>상세내용 보기</summary><dl>
+                <dt>처리 항목</dt><dd>올린 파일(이미지·PDF). 서류에 성명·생년월일이 있으면 그대로 AI 서버로 전송되므로, 가능하면 해당 부분을 가리고 올려 주세요.</dd>
+                <dt>추출 항목</dt><dd>사업명·과정명·발급기관·날짜만. 성명·생년월일은 출력하지 않도록 지시하며 서버도 정해진 항목만 돌려줍니다.</dd>
+                <dt>처리 위탁·국외 이전</dt><dd>AI 처리 동의와 같습니다 (코디세이 교육용 게이트웨이 → Anthropic, 미국).</dd>
+                <dt>보유 기간</dt><dd>파일과 판독 결과를 서버에 저장하지 않습니다.</dd></dl></details>
+              <div class="cert-row"><input type="file" id="certFile" accept="image/png,image/jpeg,image/webp,application/pdf" aria-label="증빙 파일 선택">
+                <button class="btn ghost" id="certBtn" type="button">AI로 읽기</button></div>
+              <div id="certResult"></div>
+            </div>
             <label class="check"><input type="checkbox" id="youth" name="youth" checked> 만 15~34세 청년입니다 <small class="muted">(나이는 저장·전송하지 않고 해당 여부만 사용)</small></label>
           </fieldset>
           <div class="field"><label for="experience">2. 내 경험 <em>*</em> <small class="muted">훈련·상담·프로젝트·자격·아르바이트 등 자유롭게</small></label>
@@ -112,9 +124,45 @@
             <div class="field"><label for="sregion">희망 지역</label>
               <select id="sregion" name="region"><option>서울</option><option>경기</option><option>인천</option><option>부산</option><option>대구</option><option>광주</option><option>대전</option><option>울산</option><option>세종</option><option>강원</option><option>충북</option><option>충남</option><option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option><option selected>무관</option></select></div>
           </div>
-          <div class="consent">
-            <label><input type="checkbox" id="consent" name="consent"> <b>4. ‘지원제도 활용 가능’ 표시에 동의</b></label>
-            <p>동의하면 내가 지원한 기업의 지원자 화면에 <b>“채용 시 활용 가능한 정부지원제도 있음”</b>만 표시됩니다. 어떤 사업에 참여했는지, 나이는 기업에 보이지 않으며, 사유는 <b>채용 확정 후 신청 단계</b>에서만 동의 범위 안에서 전달됩니다. 언제든 끌 수 있습니다.</p>
+          <div class="consents">
+            <p class="consent-title"><b>4. 개인정보 동의</b> <small class="muted">동의 문구 버전 2026-10-10-v1</small></p>
+            <div class="consent-item">
+              <label class="check"><input type="checkbox" name="agree_privacy" data-consent="개인정보 수집·이용(필수)"> <span><b class="req">[필수]</b> 개인정보 수집·이용에 동의합니다.</span></label>
+              <details class="policy"><summary>상세내용 보기</summary><dl>
+                <dt>운영 주체</dt><dd>이음24 웹 시제품 (디딤돌파트너스, 공모전·교육 과제용)</dd>
+                <dt>목적</dt><dd>이력 정리, 공고 추천, 지원자 등록, 동의 선택 관리</dd>
+                <dt>처리 항목</dt><dd>입력한 경험·희망 직무·지역, 선택한 참여 사업과 날짜, 청년 해당 여부, 포트폴리오, 동의·철회 내역 (성명·연락처·주민번호는 받지 않음)</dd>
+                <dt>보유·이용 기간</dt><dd>서버에 저장하지 않습니다. 요청을 처리한 뒤 바로 폐기하고, 화면 값은 이 브라우저 탭을 닫을 때까지만 남습니다.</dd>
+                <dt>거부 권리와 영향</dt><dd>거부해도 서비스 소개와 공고 탐색은 가능합니다. 이력 정리·지원자 등록은 할 수 없습니다.</dd>
+                <dt>철회 방법</dt><dd>체크를 해제하면 철회되며, 입력한 경험·날짜·포트폴리오를 화면에서 삭제합니다.</dd></dl></details>
+            </div>
+            <div class="consent-item">
+              <label class="check"><input type="checkbox" name="agree_ai" data-consent="AI 처리(처리위탁·국외이전)"> <span><b class="req">[AI 기능 사용 시 필수]</b> 입력 내용을 AI로 정리하는 데 동의합니다.</span></label>
+              <details class="policy"><summary>상세내용 보기</summary><dl>
+                <dt>처리 내용</dt><dd>이력 정리·역량 문장·자기소개 초안·포트폴리오 초안 작성, 증빙 서류 판독(별도 동의 시)</dd>
+                <dt>처리 위탁·국외 이전</dt><dd>입력 내용이 AI 중계 서버(코디세이 교육용 게이트웨이, copa.codyssey.kr)를 거쳐 AI 제공사(Anthropic, 미국)의 모델로 전송됩니다. 전송 시점: 버튼을 누를 때. 전송 방법: 암호화(HTTPS) 통신.</dd>
+                <dt>전송 항목</dt><dd>내 경험·희망 직무·지역, 참여 사업 종류와 날짜. 나이 숫자·성명·연락처는 보내지 않습니다.</dd>
+                <dt>보유 기간</dt><dd>이음24 서버는 저장하지 않습니다. 중계 서버·AI 제공사의 보관은 각 사업자 정책을 따르며, 실제 운영 전 계약으로 확정할 예정입니다.</dd>
+                <dt>거부 권리와 영향</dt><dd>거부해도 규칙 기반 기본 정리와 공고 추천은 이용할 수 있습니다. 이 경우 입력 내용은 AI 서버로 전송되지 않습니다.</dd></dl></details>
+            </div>
+            <div class="consent-item">
+              <label class="check"><input type="checkbox" id="consent" name="consent" data-consent="지원제도 활용 가능 표시 공개(선택)"> <span><b class="opt">[선택]</b> ‘지원제도 활용 가능’ 표시 공개에 동의합니다.</span></label>
+              <details class="policy"><summary>상세내용 보기</summary><dl>
+                <dt>목적</dt><dd>지원한 기업이 채용 전에 지원제도 활용 가능 여부를 확인</dd>
+                <dt>제공 항목</dt><dd>“채용 시 활용 가능한 정부지원제도 있음” 표시 1개. 참여 사업명·나이·세부 이력은 제외</dd>
+                <dt>제공받는 곳</dt><dd>같은 브라우저의 기업·담당자 시연 화면. 외부 기업·기관에 전송하지 않습니다.</dd>
+                <dt>거부 권리와 영향</dt><dd>거부해도 이력 정리·공고 탐색·지원은 가능하며, 기업에는 아무 표시도 보이지 않습니다.</dd>
+                <dt>철회 방법</dt><dd>체크를 해제하면 즉시 기업 화면에서 표시가 사라집니다.</dd></dl></details>
+            </div>
+            <div class="consent-item">
+              <label class="check"><input type="checkbox" name="agree_detail" data-consent="채용 후 세부정보 열람(선택)"> <span><b class="opt">[선택]</b> 채용이 확정되면 지원금 신청을 위해 참여 이력 세부정보를 기업·담당자가 보는 데 동의합니다.</span></label>
+              <details class="policy"><summary>상세내용 보기</summary><dl>
+                <dt>목적</dt><dd>채용 확정 후 지원금 신청에 필요한 참여 이력과 확인 항목 검토</dd>
+                <dt>제공 항목</dt><dd>참여 사업명, 수료일·인정일, 참여 후 최초 취업 여부, 증빙 판독 결과, 지침 확인 항목</dd>
+                <dt>제공 시점</dt><dd>채용 확정 이후에만. 면접·서류 단계에서는 제공하지 않습니다.</dd>
+                <dt>거부 권리와 영향</dt><dd>거부해도 지원·채용에는 영향이 없으며, 신청 단계에서 따로 동의할 수 있습니다.</dd></dl></details>
+            </div>
+            <details class="consent-log"><summary>나의 동의 내역 보기</summary><ul id="consentLog"><li class="muted">아직 동의 내역이 없습니다.</li></ul></details>
           </div>
           <p class="msg" id="seekMsg" role="alert" hidden></p>
           <button class="btn primary block" id="seekBtn" type="submit">AI로 이력 정리 · 공고 추천</button>

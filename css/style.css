@@ -257,6 +257,37 @@ table.acts td:first-child { white-space: nowrap; } table.acts td:last-child { wh
 table.batch td:nth-child(2) { white-space: nowrap; }
 table.batch td:last-child { white-space: normal; }
 
+
+/* 동의·증빙·포트폴리오 */
+.consents { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 6px 0 12px; background: var(--bg); }
+.consent-title { margin: 0 0 6px; }
+.consent-item { padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.consent-item:last-of-type { border-bottom: 0; }
+.consent-item label.check { align-items: flex-start; }
+.consent-item label.check input { margin-top: 4px; }
+.req { color: var(--bad); } .opt { color: var(--brand); }
+details.policy, details.consent-log { background: transparent; border: 0; padding: 2px 0 0 26px; margin: 0; font-size: 13px; }
+details.policy summary, details.consent-log summary { font-weight: 500; color: var(--muted); font-size: 13px; }
+details.policy dl { margin: 6px 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 10px; }
+details.policy dt { font-weight: 700; color: var(--text); } details.policy dd { margin: 0; color: var(--muted); }
+details.consent-log { padding-left: 0; margin-top: 8px; }
+details.consent-log ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
+.cert-box { border: 1px dashed var(--brand); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+.cert-title { margin: 0 0 6px; font-size: 14px; }
+.cert-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.cert-row input[type="file"] { flex: 1; min-width: 180px; width: auto; }
+.cert-row .btn { padding: 9px 14px; font-size: 14px; }
+.cert-read { margin-top: 8px; background: var(--ok-bg); border-radius: 10px; padding: 8px 12px; font-size: 14px; }
+.cert-read.warn { background: var(--warn-bg); }
+.cert-read ul { margin: 4px 0; padding-left: 18px; }
+.pf-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+.pf-actions .btn { padding: 8px 14px; font-size: 14px; }
+#pfText { margin-top: 6px; }
+ul.points { margin: 6px 0; padding-left: 18px; font-size: 13.5px; }
+details.pf { padding: 6px 10px; margin: 4px 0 6px; font-size: 13.5px; }
+details.pf pre { white-space: pre-wrap; font-family: inherit; margin: 6px 0 0; color: var(--text); }
+@media (max-width: 720px) { details.policy dl { grid-template-columns: 1fr; } }
+
 /* 반응형: 태블릿 */
 @media (max-width: 900px) {
   .grid2 { grid-template-columns: 1fr; }

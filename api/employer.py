@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from ai import generate_json, model_name, provider  # noqa: E402
 from common import ApiError, JsonHandler, text  # noqa: E402
 from match import guard  # noqa: E402
-from userinput import parse_posting, parse_seeker, posting_to_form  # noqa: E402
+from userinput import parse_posting, parse_seeker, posting_to_form, redact_programs  # noqa: E402
 from rules import judge, posting_check  # noqa: E402
 from synthetic import POSTINGS, applicants_for  # noqa: E402
 
@@ -34,9 +34,13 @@ requirements는 최대 8개, suggestions는 최대 3개입니다."""
 
 
 def employer_view(applicant: dict, post: dict) -> dict:
+    """기업에 보이는 지원자 정보. 핵심 포인트는 지원자가 이미 등록한 값을 그대로 쓰고 AI를 다시 부르지 않는다(토큰 0).
+    채용 전이므로 참여 사업명은 가리고, 사유·연령·참여 이력 자체는 넣지 않는다."""
     j = judge(applicant, post, applicant.get("consent", False))
-    return {"id": applicant["id"], "alias": applicant["alias"], "headline": applicant["headline"], "applied": applicant["applied"],
-            "badge": bool(j["badge"]), "is_me": applicant.get("is_me", False)}  # ← 사유·연령·참여 이력은 넣지 않음
+    return {"id": applicant["id"], "alias": applicant["alias"], "headline": redact_programs(applicant["headline"]), "applied": applicant["applied"],
+            "points": [redact_programs(x) for x in applicant.get("points") or []][:8],
+            "portfolio": redact_programs(applicant.get("portfolio") or ""),
+            "badge": bool(j["badge"]), "is_me": applicant.get("is_me", False)}
 
 
 def my_applicant(mine, post: dict) -> dict | None:
@@ -95,4 +99,4 @@ class handler(JsonHandler):
                                          for p in POSTINGS]}
 
     def handle_post(self):
-        return build(self.read_json())
+        return build(self.read_json(max_body=60_000))

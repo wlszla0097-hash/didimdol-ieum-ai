@@ -92,10 +92,13 @@ for _p in POSTINGS:
 # 기업 화면용 가상 지원자. 지원자마다 동의 여부와 (비공개) 참여 이력이 다르다.
 _APPLICANT_TEMPLATES = [
     {"suffix": "A", "age": 25, "consent": True, "headline": "{job} 직무 관련 훈련 수료, 실습 프로젝트에서 실무 도구 사용 경험",
+     "points": ["{job} 직무 훈련 과정 수료", "실습 프로젝트에서 실무 도구 사용", "팀 과제 일정 관리 담당"],
      "programs": [{"type": "청년도전지원사업", "completed": "2026-07-31", "status": "수료"}], "insurance": []},
     {"suffix": "B", "age": 31, "consent": True, "headline": "{job} 분야 아르바이트 1년, 고객 응대·문서 정리 경험",
+     "points": ["{job} 분야 아르바이트 1년", "고객 응대·문서 정리"],
      "programs": [], "insurance": [{"company": "△△마트", "acquired": "2025-01-02", "lost": "2025-12-31"}]},
     {"suffix": "C", "age": 28, "consent": False, "headline": "{job} 직무 전환 준비, 관련 온라인 강의 수료",
+     "points": ["{job} 관련 온라인 강의 수료", "이전 직무에서 일정·재고 관리"],
      "programs": [{"type": "국민취업지원제도", "qualified": "2026-03-02", "iap": "2026-03-16", "status": "참여 중"}], "insurance": []},
 ]
 _APPLIED = ["2026-10-02", "2026-10-05", "2026-10-07"]
@@ -106,6 +109,7 @@ def applicants_for(posting: dict) -> list[dict]:
     for i, t in enumerate(_APPLICANT_TEMPLATES):
         out.append({"id": f"{posting['id']}-{t['suffix']}", "alias": f"지원자 {t['suffix']}", "age": t["age"], "consent": t["consent"],
                     "headline": t["headline"].format(job=posting["job"]), "programs": t["programs"], "insurance": t["insurance"],
+                    "points": [x.format(job=posting["job"]) for x in t["points"]], "portfolio": "",
                     "applied": _APPLIED[i]})
     return out
 

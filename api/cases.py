@@ -51,10 +51,10 @@ def build_case(post: dict, app: dict, hire: date, contract: dict | None = None, 
     sch = schedule(hire, today)
     if j["type"] == "non_capital":
         evidence = {"open": True, "title": "비수도권 유형 — 청년 연령 확인", "lines": ["취업애로 요건 없이 청년(만 15~34세) 채용 시 대상. 연령은 고용24 회원 정보로 확인"]}
-    elif j["eligible"] and app.get("consent"):
+    elif j["eligible"] and app.get("detail_consent", app.get("consent")):  # 채용 후 세부정보 열람 동의(지원자 선택)
         evidence = {"open": True, "title": f"취업애로청년 근거: {j['reason']}", "lines": history_flags(app, before=hire)["evidence"]}
     elif j["eligible"]:
-        evidence = {"open": False, "title": "근로자 동의 전 — 참여 이력 근거 비공개", "lines": ["신청 시 근로자 본인의 정보 제공 동의가 필요합니다."]}
+        evidence = {"open": False, "title": "근로자 동의 전 — 참여 이력 근거 비공개", "lines": ["지원자가 '채용 후 세부정보 열람'에 동의하지 않았습니다. 신청 시 근로자 본인의 동의가 필요합니다."]}
     else:
         evidence = {"open": True, "title": "취업애로청년 근거 미확인", "lines": ["참여 이력에서 해당 근거가 확인되지 않음 — 다른 요건 해당 여부는 고용센터 확인"]}
     checklist = [i for i in pc["items"] if i["item"] != "지원 유형"]
@@ -90,7 +90,7 @@ class handler(JsonHandler):
         return {"ok": True, "cases": demo_cases()}
 
     def handle_post(self):
-        b = self.read_json()
+        b = self.read_json(max_body=60_000)
         if not isinstance(b.get("posting"), dict):
             raise ApiError(400, "missing_input", "공고를 먼저 점검하세요.")
         post = parse_posting(b["posting"])
