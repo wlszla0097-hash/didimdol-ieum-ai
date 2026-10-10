@@ -70,7 +70,8 @@ def check(f: dict, today: date | None = None) -> list[dict]:
     elif not rate:
         add(CHECK, "최저임금", f"{year}년 최저임금 미등록 — 고시 금액 확인 필요 (환산 시급 {hourly:,.0f}원)", "최저임금법 제6조")
     elif hourly + 0.5 < rate:
-        add(VIOLATION, "최저임금", f"환산 시급 {hourly:,.0f}원 < {year}년 최저임금 {rate:,}원 [{how}]", "최저임금법 제6조")
+        need = f" — 월 환산 최소 {rate * monthly_hours(weekly):,}원 필요" if wtype != "시급" and weekly else ""
+        add(VIOLATION, "최저임금", f"환산 시급 {hourly:,.0f}원 < {year}년 최저임금 {rate:,}원 [{how}]{need}", "최저임금법 제6조")
     else:
         add(OK, "최저임금", f"환산 시급 {hourly:,.0f}원 ≥ {year}년 최저임금 {rate:,}원 [{how}]", "최저임금법 제6조")
 

@@ -110,3 +110,10 @@ def test_case_discloses_reason_only_with_consent():
 def test_demo_cases_statuses():
     st = {c["company"]: c["status"] for c in case.demo_cases(today=date(2026, 10, 10))}
     assert st["가온유통 (가상)"] == "보완 필요" and st["세진정밀 (가상)"] == "검토 대기"
+
+
+def test_contract_guard_blocks_invented_numbers():
+    src = "최저임금: 환산 시급 9,569원 < 2026년 최저임금 10,320원 — 월 환산 최소 2,156,880원 필요"
+    assert guard("월 2,150,000원 이상으로 인상하세요.", src, forbid=False) is None
+    assert guard("월 2,156,880원 이상으로 인상하세요.", src, forbid=False)
+    assert guard("최저임금 10,320원 미달이라 지원금 대상 확인 필요", src, forbid=False)  # 근로계약 설명은 금지어 검사 제외

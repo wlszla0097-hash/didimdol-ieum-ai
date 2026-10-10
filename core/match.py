@@ -44,10 +44,10 @@ FORBIDDEN = re.compile(r"장려금|지원금|수급|자격 요건|취업애로|�
 NUM = re.compile(r"\d+(?:[.,]\d+)*")
 
 
-def guard(text: str, source: str, limit: int = 300) -> str | None:
-    """AI 문장 검증: 금지 내용이 있거나, 입력에 없던 숫자가 새로 나오면 None(차단)."""
+def guard(text: str, source: str, limit: int = 300, forbid: bool = True) -> str | None:
+    """AI 문장 검증: 금지 내용이 있거나(forbid=True일 때), 입력에 없던 숫자가 새로 나오면 None(차단)."""
     t = str(text or "").strip()[:limit]
-    if not t or FORBIDDEN.search(t):
+    if not t or (forbid and FORBIDDEN.search(t)):
         return None
     src = source.replace(",", "")
     for n in NUM.findall(t):

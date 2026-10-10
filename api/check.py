@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from ai import generate_json, provider  # noqa: E402
 from common import ApiError, JsonHandler, num, text  # noqa: E402
 from labor import check  # noqa: E402
+from match import guard  # noqa: E402
 
 SYSTEM = """당신은 근로계약 점검 결과를 사업주에게 쉽게 설명하는 보조자입니다.
 - [점검 결과]에 있는 내용만 설명하고, 새로운 위반 판단이나 수치를 추가하지 않습니다.
@@ -43,11 +44,23 @@ class handler(JsonHandler):
         explain, ai_error = None, None
         if issues:
             try:
-                ai = generate_json(SYSTEM, "[점검 결과]\n" + json.dumps(issues, ensure_ascii=False), max_tokens=1200)
+                src = "[점검 결과]\n" + json.dumps(issues, ensure_ascii=False)
+                ai = generate_json(SYSTEM, src, max_tokens=1200)
                 names = {r["item"] for r in issues}
-                explain = {"summary": text(ai.get("summary"), 400),
-                           "actions": [{"item": text(a.get("item"), 40), "explain": text(a.get("explain"), 300), "fix": text(a.get("fix"), 200)}
-                                       for a in (ai.get("actions") or [])[:6] if a.get("item") in names]}  # 점검에 없는 항목은 버림
+                actions, blocked = [], 0
+                for a in (ai.get("actions") or [])[:6]:
+                    if a.get("item") not in names:  # 점검에 없는 항목은 버림
+                        blocked += 1
+                        continue
+                    # 점검 결과에 없는 숫자(금액·비율 등)를 AI가 새로 만들면 그 문장은 차단
+                    ex, fx = guard(a.get("explain"), src, 300, forbid=False), guard(a.get("fix"), src, 200, forbid=False)
+                    blocked += (ex is None) + (fx is None)
+                    if ex or fx:
+                        actions.append({"item": text(a.get("item"), 40), "explain": ex or "점검 결과의 근거 조문을 확인하세요.",
+                                        "fix": fx or "근거 조문 기준에 맞게 계약서 내용을 수정하세요."})
+                summary = guard(ai.get("summary"), src, 400, forbid=False)
+                blocked += summary is None
+                explain = {"summary": summary or "아래 항목을 근거 조문에 맞게 수정하세요.", "actions": actions, "blocked": blocked}
             except ApiError as e:
                 ai_error = e.message
         return {"ok": True, "results": results, "explain": explain, "ai_error": ai_error, "meta": {"ai": provider()}}

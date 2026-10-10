@@ -297,6 +297,7 @@ function renderCheck({ results, explain, ai_error }, cs) {
   let ai = "";
   if (explain) {
     ai = `<h3>🤖 AI 쉬운 설명</h3><div class="summary">${esc(explain.summary)}</div>` +
+      (explain.blocked ? `<p class="meta">점검 결과에 없는 숫자·항목이 나온 AI 문장 ${explain.blocked}건은 서버가 차단했습니다.</p>` : "") +
       explain.actions.map((a) => `<div class="rec"><b>${esc(a.item)}</b><p>${esc(a.explain)}</p><p class="next">✏️ ${esc(a.fix)}</p></div>`).join("");
   } else if (ai_error) {
     ai = `<div class="msg info">AI 설명을 불러오지 못했습니다: ${esc(ai_error)} — 규칙 점검 결과는 정상입니다.</div>`;
