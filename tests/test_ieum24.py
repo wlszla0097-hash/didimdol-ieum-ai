@@ -170,3 +170,16 @@ def test_contract_guard_blocks_invented_numbers():
     assert guard("월 2,150,000원 이상으로 인상하세요.", src, forbid=False) is None
     assert guard("월 2,156,880원 이상으로 인상하세요.", src, forbid=False)
     assert guard("최저임금 10,320원 미달이라 지원금 대상 확인 필요", src, forbid=False)  # 근로계약 설명은 금지어 검사 제외
+
+
+def test_guard_number_formats():
+    src = "데이터 분석 과정 320시간, 2026년 8월, 최저 월 2,156,880원"
+    assert guard("2026.08 수료 (320시간)", src)          # 표기 형식이 달라도 같은 숫자는 통과
+    assert guard("월 2,156,880원", src, forbid=False)
+    assert guard("월 2,150,000원", src, forbid=False) is None
+    assert guard("3년 경력", src) is None
+
+
+def test_min_wage_posting_not_recommended():
+    out = seeker.run(profile.parse_seeker({**PROFILE, "experience": "엑셀로 재고 관리, 사무 보조 경험", "job": "사무", "region": "서울"}))
+    assert "JOB-09" not in [j["id"] for j in out["jobs"]] and out["meta"]["excluded"]["min_wage"] == 1
