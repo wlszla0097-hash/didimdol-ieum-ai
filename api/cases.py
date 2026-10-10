@@ -1,7 +1,7 @@
 """채용 확정 → 신청 건(주무관 확인 보조 화면용).
 
-POST /api/case  {"posting_id", "applicant_id", "hire_date", "contract": {...근로조건}, "my_application": {...}}
-GET  /api/case  시연용 신청 건 목록
+POST /api/cases {"posting_id", "applicant_id", "hire_date", "contract": {...근로조건}, "my_application": {...}}
+GET  /api/cases 시연용 신청 건 목록
 
 - 근로계약 조건은 규칙엔진(labor.py)으로 점검하고, 공고 점검 항목·고용유지 기간·신청 가능일을 함께 정리한다.
 - 참여 이력 근거(사유)는 채용 확정 후, 근로자가 동의한 경우에만 신청 건에 붙는다.

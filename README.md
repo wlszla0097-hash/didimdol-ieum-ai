@@ -49,7 +49,7 @@
 ├─ api/                  # 백엔드: 파일 1개 = 함수 1개 (/api/파일명)
 │  ├─ seeker.py          # GET 합성 인물 목록 / POST 역량 문장·공고 추천·표시 미리보기 (AI)
 │  ├─ employer.py        # GET 공고 목록 / POST 공고 점검 + 지원자 목록(표시 여부만)
-│  ├─ case.py            # GET 시연 신청 건 / POST 채용 확정 → 신청 건(근거·점검·일정)
+│  ├─ cases.py           # GET 시연 신청 건 / POST 채용 확정 → 신청 건(근거·점검·일정)
 │  ├─ check.py           # POST 근로계약 점검 (규칙) + AI 쉬운 설명
 │  ├─ diagnose.py        # POST 기업 지원사업 진단 (AI, 확장 2단계)
 │  ├─ programs.py        # GET 지원사업 목록 (공공데이터)

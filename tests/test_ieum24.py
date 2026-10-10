@@ -13,7 +13,7 @@ for k in ("ANTHROPIC_API_KEY", "GEMINI_API_KEY", "WORK24_KEY"):
 
 import pytest  # noqa: E402
 
-import case  # noqa: E402
+import cases as case  # noqa: E402
 import employer  # noqa: E402
 import rules  # noqa: E402
 import seeker  # noqa: E402

@@ -280,7 +280,7 @@ $("#checkForm").addEventListener("submit", async (e) => {
   try {
     const [chk, cs] = await Promise.all([
       api("/api/check", { method: "POST", body, onSlow: () => (out.innerHTML = loadingHtml("AI 설명 작성이 늦어지고 있어요. 조금만 기다려 주세요")) }),
-      api("/api/case", { method: "POST", timeoutMs: 20000, body: { posting_id: state.post.id, applicant_id: state.hireTarget.id, hire_date: body.start_date,
+      api("/api/cases", { method: "POST", timeoutMs: 20000, body: { posting_id: state.post.id, applicant_id: state.hireTarget.id, hire_date: body.start_date,
         contract: body, my_application: mine && { persona_id: mine.id, consent: mine.consent } } }),
     ]);
     renderCheck(chk, cs.case);
@@ -324,7 +324,7 @@ function renderCheck({ results, explain, ai_error }, cs) {
 async function loadCases() {
   const box = $("#cases");
   try {
-    const demo = (await api("/api/case", { timeoutMs: 15000 })).cases;
+    const demo = (await api("/api/cases", { timeoutMs: 15000 })).cases;
     const all = [...state.sessionCases.map((c) => ({ ...c, fresh: true })), ...demo];
     $("#caseSrc").textContent = `신청 건 ${all.length}건 (이번 시연에서 보낸 건 ${state.sessionCases.length}건 포함) · 합성 데이터`;
     box.innerHTML = all.map(caseCard).join("");
